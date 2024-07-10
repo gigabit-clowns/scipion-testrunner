@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "scipion-testrunner"
+version = "0.0.1"
+description = "Module to handle in an efficient way the execution of Scipion tests"
+authors = ["Martín Salinas <ssalinasmartin@gmail.com>"]
+readme = "README.md"
+license = "LICENSE"
+keywords = ["scipion", "testing"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+pytest = "^8.1.1"
+pytest-cov = "^5"
+ruff = "^0.5.1"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["*_test.py"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+scipion-testrunner = "scipion_testrunner:cli"
