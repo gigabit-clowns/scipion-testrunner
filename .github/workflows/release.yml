@@ -19,10 +19,6 @@ jobs:
     
     - name: Install Python dependencies
       run: pip install --upgrade build
-
-    - name: Install package
-      working-directory: ${{ github.workspace }}
-      run: pip install -e .
     
     - name: Get package version
       run: |
