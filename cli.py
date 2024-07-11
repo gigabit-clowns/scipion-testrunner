@@ -53,7 +53,7 @@ def __get_args_from_parser(parser: argparse.ArgumentParser):
 	"""
 	args = vars(parser.parse_args())
 	if __TEST_DATA_PARAM_NAME in args:
-		args[__TEST_DATA_PARAM_NAME] = os.path.expanduser(args[__TEST_DATA_PARAM_NAME])
+		args[__TEST_DATA_PARAM_NAME] = os.path.abspath(args[__TEST_DATA_PARAM_NAME])
 	return args
 
 if __name__ == "__main__":
