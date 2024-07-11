@@ -24,7 +24,7 @@ jobs:
       id: version
       run: |
         export VERSION=$(pip show ${{ github.event.repository.name }} | grep Version | awk '{print $2}')
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
         echo "Version number: $VERSION"
     
     - name: Build and publish
