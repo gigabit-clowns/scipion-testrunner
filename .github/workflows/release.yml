@@ -21,8 +21,11 @@ jobs:
       working-directory: ${{ github.workspace }}
       run: pip install -e .
     
-    - run: echo "$(pip show scipion-testrunner | grep Version | awk '{print $2}')"
-    - run: echo ${{ github.event.repository.name }}
+    - name: Get package version
+      run: |
+        export VERSION=$(pip show ${{ github.event.repository.name }} | grep Version | awk '{print $2}')
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "Version number: $VERSION"
     
     #- name: Get tag name
     #  id: variables
