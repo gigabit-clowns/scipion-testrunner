@@ -20,6 +20,9 @@ jobs:
     - name: Install Python dependencies
       run: pip install --upgrade build twine
     
+    - name: Install Package
+      run: pip install -e .
+    
     - name: Get package version
       id: version
       run: |
