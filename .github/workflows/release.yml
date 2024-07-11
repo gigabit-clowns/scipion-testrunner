@@ -17,11 +17,9 @@ jobs:
       with:
         python-version: '3.12'
 
-    - name: Install dependencies
+    - name: Install package
       working-directory: ${{ github.workspace }}
-      run: |
-        pip install poetry
-        poetry install
+      run: pip install -e .
     
     #- name: Get tag name
     #  id: variables
