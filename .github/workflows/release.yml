@@ -8,9 +8,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@main
-    
-    - name: Set up MPI
-      uses: mpi4py/setup-mpi@master
 
     - name: Set up Python
       uses: actions/setup-python@main
@@ -43,10 +40,10 @@ jobs:
       uses: mathieudutour/github-tag-action@v6.2
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        custom_tag: ${{ steps.version.outputs.TAG_NAME }}
+        custom_tag: ${{ steps.version.outputs.VERSION }}
     
     - name: Create a GitHub release
       uses: ncipollo/release-action@main
       with:
         tag: ${{ steps.tag_version.outputs.new_tag }}
-        name: ${{ steps.version.outputs.TAG_NAME }}
+        name: ${{ steps.version.outputs.VERSION }}
