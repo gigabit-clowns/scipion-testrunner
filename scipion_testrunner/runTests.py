@@ -1,5 +1,9 @@
 # General imports
-import subprocess, argparse, multiprocessing, sys, json, os
+import subprocess
+import multiprocessing
+import sys
+import json
+import os
 
 ################################## UTILS FUNCTIONS ##################################
 def colorStr(string, color):

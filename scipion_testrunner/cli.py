@@ -1,4 +1,6 @@
-import argparse, multiprocessing, os
+import argparse
+import multiprocessing
+import os
 
 from . import runTests
 
