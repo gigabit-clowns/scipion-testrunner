@@ -2,7 +2,7 @@ name: Build package on Pull Request
 on:
   workflow_dispatch:
   pull_request:
-    branches: [devel, main]
+    branches: [main]
 
 jobs:
   build:
