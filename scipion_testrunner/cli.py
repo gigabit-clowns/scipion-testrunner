@@ -1,6 +1,6 @@
 import argparse, multiprocessing, os
 
-from src import runTests
+from . import runTests
 
 __SCIPION_PARAM_NAME = "scipion"
 __PLUGIN_PARAM_NAME = "plugin"
@@ -56,7 +56,8 @@ def __get_args_from_parser(parser: argparse.ArgumentParser):
 		args[__TEST_DATA_PARAM_NAME] = os.path.abspath(args[__TEST_DATA_PARAM_NAME])
 	return args
 
-if __name__ == "__main__":
+
+def main():
 	parser = __generate_parser()
 	parser = __add_params(parser)
 	args = __get_args_from_parser(parser)
