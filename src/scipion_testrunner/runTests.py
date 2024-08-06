@@ -111,8 +111,9 @@ def testPythonCommand(scipion, pythonCommand):
 	This function executes the given Python command within scipion3 env
 	and returns True if it succeeded or False if it failed.
 	"""
-	command = f"{getCondaActivationCmd(scipion)} && conda activate scipion3 && python -c '{pythonCommand}' 2>/dev/null && echo 1 || echo 0"
-	return bool(int(subprocess.check_output(command, shell=True).decode().replace('\n', '')))
+	command = f"{getCondaActivationCmd(scipion)} && conda activate scipion3 && python -c '{pythonCommand}'"
+	result = subprocess.run(command, shell=True)
+	return bool(result.returncode)
 
 ################################## MAIN EXECUTION FUNCTIONS ##################################
 def getAllTests(scipion, pluginModule, testPrefix):
