@@ -2,7 +2,7 @@ import argparse
 import multiprocessing
 import os
 
-from . import runTests
+from src.scipion_testrunner import runTests
 
 __SCIPION_PARAM_NAME = "scipion"
 __PLUGIN_PARAM_NAME = "plugin"
