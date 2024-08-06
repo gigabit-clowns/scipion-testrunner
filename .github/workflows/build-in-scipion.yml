@@ -1,4 +1,4 @@
-name: Build package on Pull Request
+name: Build package within Scipion's enviroment
 on:
   workflow_dispatch:
   pull_request:
