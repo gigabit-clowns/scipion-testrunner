@@ -1,7 +1,7 @@
 from typing import Dict
 
 from ..logger import logger
-from ..scipion import scipion_service
+from ..repository import scipion_service
 
 def run_tests(args: Dict):
     test_list = scipion_service.get_all_tests(args['scipion'], args['plugin'])

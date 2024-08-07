@@ -1,7 +1,7 @@
 from typing import List
 
 from ..logger import logger
-from ..shell import shell_service, python_service
+from . import shell_service, python_service
 
 def get_all_tests(scipion: str, plugin_module: str):
 	"""
