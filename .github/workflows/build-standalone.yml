@@ -35,5 +35,8 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: poetry install
 
+      - name: Use CLI standalone
+        run: poetry run scipion-testrunner -h
+      
       - name: Use CLI as Python module
-        run: python -m scipion-testrunner -h
+        run: poetry run python -m scipion-testrunner -h
