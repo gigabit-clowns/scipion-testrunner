@@ -51,7 +51,7 @@ class Logger:
 		- text (str): Error message to show.
 		- ret_code (int): Optional. Return code to end the exection with.
 		"""
-		self.__call__(red(text))
+		self.__call__(red(__remove_non_printable(text)))
 		sys.exit(ret_code)
 
 ####################### TEXT MODES #######################
