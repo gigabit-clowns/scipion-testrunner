@@ -12,7 +12,49 @@ __YELLOW = "\033[93m"
 __END_FORMAT = "\033[0m"
 __FORMATTING_CHARACTERS = [__BOLD, __BLUE, __RED, __GREEN, __YELLOW, __END_FORMAT]
 
-####################### TEXT MODE #######################
+class Logger:
+	"""
+	### Logger class for keeping track of messages.
+	"""
+
+	def __init__(self):
+		"""
+		### Constructor.
+		"""
+		self.__log_file = None
+
+	def start_log_file(self, log_path: str):
+		"""
+		### Initiates the log file.
+
+		#### Params:
+		- log_path (str): Path to the log file.
+		"""
+		self.__log_file = open(log_path, 'w')
+ 
+	def __call__(self, text: str):
+		"""
+		### Log a message.
+		
+		#### Params:
+		- text (str): Message to be logged. Supports fancy formatting.
+		"""
+		print(text, flush=True)
+		if self.__log_file is not None:
+			print(__remove_non_printable(text), file=self.__log_file, flush=True)
+
+	def log_error(self, text: str, ret_code: int=1):
+		"""
+		### This function prints an error message and stops exection.
+
+		#### Params:
+		- text (str): Error message to show.
+		- ret_code (int): Optional. Return code to end the exection with.
+		"""
+		self.__call__(red(text))
+		sys.exit(ret_code)
+
+####################### TEXT MODES #######################
 def green(text: str) -> str:
 	"""
 	### This function returns the given text formatted in green color.
@@ -73,7 +115,7 @@ def bold(text: str) -> str:
 	"""
 	return f"{__BOLD}{text}{__END_FORMAT}"
 
-def removeNonPrintable(text: str) -> str:
+def __remove_non_printable(text: str) -> str:
 	"""
 	### This function returns the given text without non printable characters.
 
@@ -86,47 +128,5 @@ def removeNonPrintable(text: str) -> str:
 	for formatting_char in __FORMATTING_CHARACTERS:
 		text = text.replace(formatting_char, "")
 	return text
-
-class Logger:
-	"""
-	### Logger class for keeping track of messages.
-	"""
-
-	def __init__(self):
-		"""
-		### Constructor.
-		"""
-		self.__log_file = None
-
-	def start_log_file(self, log_path: str):
-		"""
-		### Initiates the log file.
-
-		#### Params:
-		- log_path (str): Path to the log file.
-		"""
-		self.__log_file = open(log_path, 'w')
- 
-	def __call__(self, text: str):
-		"""
-		### Log a message.
-		
-		#### Params:
-		- text (str): Message to be logged. Supports fancy formatting.
-		"""
-		print(text, flush=True)
-		if self.__log_file is not None:
-			print(removeNonPrintable(text), file=self.__log_file, flush=True)
-
-	def log_error(self, text: str, ret_code: int=1):
-		"""
-		### This function prints an error message and stops exection.
-
-		#### Params:
-		- text (str): Error message to show.
-		- ret_code (int): Optional. Return code to end the exection with.
-		"""
-		self.__call__(red(text))
-		sys.exit(ret_code)
 
 logger = Logger()
