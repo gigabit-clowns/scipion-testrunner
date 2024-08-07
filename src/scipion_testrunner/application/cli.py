@@ -2,7 +2,7 @@ import argparse
 import multiprocessing
 import os
 
-from . import runTests
+from ..domain import test_service
 
 __SCIPION_PARAM_NAME = "scipion"
 __PLUGIN_PARAM_NAME = "plugin"
@@ -63,7 +63,7 @@ def main():
 	parser = __generate_parser()
 	parser = __add_params(parser)
 	args = __get_args_from_parser(parser)
-	runTests.main(args)
+	test_service.run_tests(args)
 
 
 if __name__ == "__main__":

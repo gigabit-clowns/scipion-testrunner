@@ -23,7 +23,7 @@ def getAllTests(scipion: str, plugin_module: str, test_prefix: str):
 		exit(1)
 
 	# Define test command string variables
-	scipionTestsStartingSpaces = '   '
+	scipion_tests_starting_spaces = '   '
 
 	# Separate lines into a list
 	lines = output.split('\n')
@@ -31,8 +31,8 @@ def getAllTests(scipion: str, plugin_module: str, test_prefix: str):
 	# For each line, keep only the ones about individual tests in a reduced form
 	filtered_lines = []
 	for line in lines:
-		if line.startswith(scipionTestsStartingSpaces):
-			filtered_lines.append(line.replace(f'{scipionTestsStartingSpaces}scipion3 {test_prefix}', ''))
+		if line.startswith(scipion_tests_starting_spaces):
+			filtered_lines.append(line.replace(f'{scipion_tests_starting_spaces}scipion3 {test_prefix}', ''))
 	
 	# If no tests were found, check if module was not found or if plugin has no tests
 	if not filtered_lines:
