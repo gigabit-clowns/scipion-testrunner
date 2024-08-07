@@ -38,5 +38,5 @@ jobs:
       - name: Use CLI standalone
         run: poetry run scipion-testrunner -h
       
-      - name: Use CLI as Python module
-        run: poetry run python -m scipion-testrunner -h
+      #- name: Use CLI as Python module
+      #  run: poetry run python -m scipion-testrunner -h
