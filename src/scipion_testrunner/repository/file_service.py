@@ -3,7 +3,7 @@ from typing import Tuple, List, Dict
 
 from ..application.logger import logger, yellow
 
-def read_test_data_file(file_path: str) -> Tuple[List[str] | None, Dict[str] | None]:
+def read_test_data_file(file_path: str) -> Tuple[List[str] | None, Dict | None]:
 	"""
 	### Returns a list with the necessary datasets for the tests, as well as 
 	### an object with the different tests and the situations where to skip them.
@@ -12,7 +12,7 @@ def read_test_data_file(file_path: str) -> Tuple[List[str] | None, Dict[str] | N
 	- file_path (str): Path to the test data json file.
 
 	#### Returns:
-	- (tuple[list[str] | None, dict[str] | None]): Tuple containing the list of 
+	- (tuple[list[str] | None, dict | None]): Tuple containing the list of 
 	datasets to download and skippable tests 
 	"""
 	try:
