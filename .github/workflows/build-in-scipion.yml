@@ -40,6 +40,4 @@ jobs:
       - name: Run Scipion-em tests
         working-directory: ${{ github.workspace }}/../
         run: |
-          sudo apt install tree
-          tree
-          scipion-testrunner ./scipion/scipion pwem --noGpu
+          scipion-testrunner ./scipion/scipion3 pwem --noGpu
