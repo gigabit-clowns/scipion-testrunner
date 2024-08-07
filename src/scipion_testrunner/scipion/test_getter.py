@@ -1,14 +1,13 @@
 from ..shell import shell_service
 from ..logger import logger
 
-def get_all_tests(scipion: str, plugin_module: str, test_prefix: str):
+def get_all_tests(scipion: str, plugin_module: str):
 	"""
 	### Finds the full list of tests from a given module
 
 	#### Params:
 	- scipion (str): Path to Scipion's executable
 	- plugin_module (str): Module name of the plugin to obtain tests from
-	- test_prefix (str): Prefix format for the test names
 
 	#### Returns:
 	- (list[str]): List of available tests
@@ -29,7 +28,7 @@ def get_all_tests(scipion: str, plugin_module: str, test_prefix: str):
 	filtered_lines = []
 	for line in lines:
 		if line.startswith(scipion_tests_starting_spaces):
-			filtered_lines.append(line.replace(f'{scipion_tests_starting_spaces}scipion3 {test_prefix}', ''))
+			filtered_lines.append(line.replace(f'{scipion_tests_starting_spaces}scipion3 tests {plugin_module}.tests.', ''))
 	
 	# If no tests were found, check if module was not found or if plugin has no tests
 	if not filtered_lines:
