@@ -15,6 +15,7 @@ def read_test_data_file(file_path: str) -> Tuple[List[str] | None, Dict | None]:
 	- (tuple[list[str] | None, dict | None]): Tuple containing the list of 
 	datasets to download and skippable tests 
 	"""
+	logger(f"TEST: \"{file_path}\"")
 	try:
 		with open(file_path, 'r') as file:
 			data_file = json.load(file)
