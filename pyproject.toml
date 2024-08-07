@@ -24,4 +24,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-scipion-testrunner = "cli:main"
+scipion-testrunner = "scipion_testrunner.cli:main"
