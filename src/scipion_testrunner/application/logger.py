@@ -63,7 +63,7 @@ class Logger:
 		#### Returns:
 		- (str): Text formatted in green color.
 		"""
-		return f"{self.__GREEN}{text}{self.__END_FORMAT}"
+		return self.__format_text(text, self.__GREEN)
 
 	def yellow(self, text: str) -> str:
 		"""
@@ -75,7 +75,7 @@ class Logger:
 		#### Returns:
 		- (str): Text formatted in yellow color.
 		"""
-		return f"{self.__YELLOW}{text}{self.__END_FORMAT}"
+		return self.__format_text(text, self.__YELLOW)
 
 	def red(self, text: str) -> str:
 		"""
@@ -87,7 +87,7 @@ class Logger:
 		#### Returns:
 		- (str): Text formatted in red color.
 		"""
-		return f"{self.__RED}{text}{self.__END_FORMAT}"
+		return self.__format_text(text, self.__RED)
 
 	def blue(self, text: str) -> str:
 		"""
@@ -99,7 +99,7 @@ class Logger:
 		#### Returns:
 		- (str): Text formatted in blue color.
 		"""
-		return f"{self.__BLUE}{text}{self.__END_FORMAT}"
+		return self.__format_text(text, self.__BLUE)
 
 	def bold(self, text: str) -> str:
 		"""
@@ -111,8 +111,21 @@ class Logger:
 		#### Returns:
 		- (str): Text formatted in bold.
 		"""
-		return f"{self.__BOLD}{text}{self.__END_FORMAT}"
+		return self.__format_text(text, self.__BOLD)
 	
+	def __format_text(self, text: str, format_code: str) -> str:
+		"""
+		### Returns the given text formatted in bold.
+
+		#### Params:
+		- text (str): Text to format.
+		- format_code (str): Formatting character.
+
+		#### Returns:
+		- (str): Text formatted in bold.
+		"""
+		return f"{format_code}{text}{self.__END_FORMAT}"
+
 	def __remove_non_printable(self, text: str) -> str:
 		"""
 		### Returns the given text without non printable characters.
