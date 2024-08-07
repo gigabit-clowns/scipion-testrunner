@@ -2,7 +2,7 @@ import argparse
 import multiprocessing
 import os
 
-from ..domain import test_service
+from scipion_testrunner.domain import test_service
 
 __SCIPION_PARAM_NAME = "scipion"
 __PLUGIN_PARAM_NAME = "plugin"
@@ -54,7 +54,7 @@ def __get_args_from_parser(parser: argparse.ArgumentParser):
 	- (Namespace): Argument's object
 	"""
 	args = vars(parser.parse_args())
-	if __TEST_DATA_PARAM_NAME in args:
+	if args[__TEST_DATA_PARAM_NAME]:
 		args[__TEST_DATA_PARAM_NAME] = os.path.abspath(args[__TEST_DATA_PARAM_NAME])
 	return args
 
@@ -67,4 +67,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+	main()
