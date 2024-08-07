@@ -1,6 +1,6 @@
 from typing import Dict
 
-from ..logger import logger
+from ..application.logger import logger
 from ..repository import scipion_service
 
 def run_tests(args: Dict):

@@ -1,6 +1,6 @@
 from typing import List
 
-from ..logger import logger
+from ..application.logger import logger
 from . import shell_service, python_service
 
 def get_all_tests(scipion: str, plugin_module: str):
