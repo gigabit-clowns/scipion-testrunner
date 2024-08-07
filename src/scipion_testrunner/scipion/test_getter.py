@@ -15,7 +15,7 @@ def get_all_tests(scipion: str, plugin_module: str):
 	ret_code, output = shell_service.run_shell_command(__get_scipion_test_search_param(scipion, plugin_module))
 	if ret_code:
 		logger.log_error(output)
-	logger("TEST:", output)
+	logger(f"TEST: {output}")
 	import sys
 	sys.exit(0)
 
