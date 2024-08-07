@@ -1,7 +1,7 @@
 from typing import List
 
-from ..shell import shell_service
 from ..logger import logger
+from ..shell import shell_service, python_service
 
 def get_all_tests(scipion: str, plugin_module: str):
 	"""
@@ -19,19 +19,9 @@ def get_all_tests(scipion: str, plugin_module: str):
 		logger.log_error(output)
 
 	test_list = __get_test_list_from_str(output, plugin_module)
-	logger(f"TEST: {output}")
-	logger(f"FILTERED LINES: {test_list}")
-	import sys
-	sys.exit(0)
+	if not test_list and not python_service.exists_python_module(plugin_module):
+		logger.log_error(f"ERROR: No tests were found for module {plugin_module}. Are you sure this module is properly installed?")
 	
-	# If no tests were found, check if module was not found or if plugin has no tests
-	if not test_list:
-		pass
-		# If import caused an error, module was not found
-		#if not testPythonCommand(scipion, f"import {plugin_module}"):
-		#	printFatalError(f"ERROR: No tests were found for module {plugin_module}. Are you sure this module is properly installed?")
-	
-	# Return full list of tests
 	return test_list
 
 def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]:
