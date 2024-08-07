@@ -1,4 +1,5 @@
-import subprocess
+from ..shell import shell_service
+from ..logger import logger
 
 def getAllTests(scipion: str, plugin_module: str, test_prefix: str):
 	"""
@@ -12,15 +13,11 @@ def getAllTests(scipion: str, plugin_module: str, test_prefix: str):
 	#### Returns:
 	- (list[str]): List of available tests
 	"""
-	# Construct the test discovery command
-	command = f"{scipion} test --grep {plugin_module}"
-
-	# Run the shell command and capture the output
-	try:
-		output = subprocess.check_output(command, shell=True, text=True)
-	except subprocess.CalledProcessError:
-		#printFatalError("ERROR: Test search command failed. Check line above for more detailed info.")
-		exit(1)
+	ret_code, output = shell_service.run_shell_command(f"{scipion} test --grep {plugin_module}")
+	if ret_code:
+		logger("TEST:", output)
+		import sys
+		sys.exit(ret_code)
 
 	# Define test command string variables
 	scipion_tests_starting_spaces = '   '
