@@ -12,11 +12,12 @@ def get_all_tests(scipion: str, plugin_module: str):
 	#### Returns:
 	- (list[str]): List of available tests
 	"""
-	ret_code, output = shell_service.run_shell_command(f"{scipion} test --grep {plugin_module}")
+	ret_code, output = shell_service.run_shell_command(__get_scipion_test_search_param(scipion, plugin_module))
 	if ret_code:
-		logger("TEST:", output)
-		import sys
-		sys.exit(ret_code)
+		logger.log_error(output)
+	logger("TEST:", output)
+	import sys
+	sys.exit(0)
 
 	# Define test command string variables
 	scipion_tests_starting_spaces = '   '
@@ -39,3 +40,13 @@ def get_all_tests(scipion: str, plugin_module: str):
 	
 	# Return full list of tests
 	return filtered_lines
+
+def __get_scipion_test_search_param(scipion: str, plugin_module: str) -> str:
+	"""
+	### Returns the Scipion test search param for a given plugin module.
+
+	#### Params:
+	- scipion (str): Path to Scipion's executable
+	- plugin_module (str): Module name of the plugin to obtain tests from
+	"""
+	return f"{scipion} test --grep {plugin_module}"
