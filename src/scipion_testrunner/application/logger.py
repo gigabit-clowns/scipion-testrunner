@@ -4,18 +4,17 @@ Provides a global logger.
 
 import sys
 
-__BOLD = "\033[1m"
-__BLUE = "\033[34m"
-__RED = "\033[91m"
-__GREEN = "\033[92m"
-__YELLOW = "\033[93m"
-__END_FORMAT = "\033[0m"
-__FORMATTING_CHARACTERS = [__BOLD, __BLUE, __RED, __GREEN, __YELLOW, __END_FORMAT]
-
 class Logger:
 	"""
 	### Logger class for keeping track of messages.
 	"""
+	__BOLD = "\033[1m"
+	__BLUE = "\033[34m"
+	__RED = "\033[91m"
+	__GREEN = "\033[92m"
+	__YELLOW = "\033[93m"
+	__END_FORMAT = "\033[0m"
+	__FORMATTING_CHARACTERS = [__BOLD, __BLUE, __RED, __GREEN, __YELLOW, __END_FORMAT]
 
 	def __init__(self):
 		"""
@@ -53,6 +52,66 @@ class Logger:
 		"""
 		self.__call__(red(self.__remove_non_printable(text)))
 		sys.exit(ret_code)
+
+	def green(self, text: str) -> str:
+		"""
+		### Returns the given text formatted in green color.
+
+		#### Params:
+		- text (str): Text to format.
+
+		#### Returns:
+		- (str): Text formatted in green color.
+		"""
+		return f"{self.__GREEN}{text}{self.__END_FORMAT}"
+
+	def yellow(self, text: str) -> str:
+		"""
+		### Returns the given text formatted in yellow color.
+
+		#### Params:
+		- text (str): Text to format.
+
+		#### Returns:
+		- (str): Text formatted in yellow color.
+		"""
+		return f"{self.__YELLOW}{text}{self.__END_FORMAT}"
+
+	def red(self, text: str) -> str:
+		"""
+		### Returns the given text formatted in red color.
+
+		#### Params:
+		- text (str): Text to format.
+
+		#### Returns:
+		- (str): Text formatted in red color.
+		"""
+		return f"{self.__RED}{text}{self.__END_FORMAT}"
+
+	def blue(self, text: str) -> str:
+		"""
+		### Returns the given text formatted in blue color.
+
+		#### Params:
+		- text (str): Text to format.
+
+		#### Returns:
+		- (str): Text formatted in blue color.
+		"""
+		return f"{self.__BLUE}{text}{self.__END_FORMAT}"
+
+	def bold(self, text: str) -> str:
+		"""
+		### Returns the given text formatted in bold.
+
+		#### Params:
+		- text (str): Text to format.
+
+		#### Returns:
+		- (str): Text formatted in bold.
+		"""
+		return f"{self.__BOLD}{text}{self.__END_FORMAT}"
 	
 	def __remove_non_printable(self, text: str) -> str:
 		"""
@@ -67,66 +126,5 @@ class Logger:
 		for formatting_char in __FORMATTING_CHARACTERS:
 			text = text.replace(formatting_char, "")
 		return text
-
-####################### TEXT MODES #######################
-def green(text: str) -> str:
-	"""
-	### Returns the given text formatted in green color.
-
-	#### Params:
-	- text (str): Text to format.
-
-	#### Returns:
-	- (str): Text formatted in green color.
-	"""
-	return f"{__GREEN}{text}{__END_FORMAT}"
-
-def yellow(text: str) -> str:
-	"""
-	### Returns the given text formatted in yellow color.
-
-	#### Params:
-	- text (str): Text to format.
-
-	#### Returns:
-	- (str): Text formatted in yellow color.
-	"""
-	return f"{__YELLOW}{text}{__END_FORMAT}"
-
-def red(text: str) -> str:
-	"""
-	### Returns the given text formatted in red color.
-
-	#### Params:
-	- text (str): Text to format.
-
-	#### Returns:
-	- (str): Text formatted in red color.
-	"""
-	return f"{__RED}{text}{__END_FORMAT}"
-
-def blue(text: str) -> str:
-	"""
-	### Returns the given text formatted in blue color.
-
-	#### Params:
-	- text (str): Text to format.
-
-	#### Returns:
-	- (str): Text formatted in blue color.
-	"""
-	return f"{__BLUE}{text}{__END_FORMAT}"
-
-def bold(text: str) -> str:
-	"""
-	### Returns the given text formatted in bold.
-
-	#### Params:
-	- text (str): Text to format.
-
-	#### Returns:
-	- (str): Text formatted in bold.
-	"""
-	return f"{__BOLD}{text}{__END_FORMAT}"
 
 logger = Logger()

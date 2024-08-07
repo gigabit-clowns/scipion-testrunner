@@ -1,7 +1,7 @@
 import json
 from typing import Tuple, List, Dict
 
-from ..application.logger import logger, yellow
+from ..application.logger import logger
 
 def read_test_data_file(file_path: str) -> Tuple[List[str] | None, Dict | None]:
 	"""
@@ -20,7 +20,7 @@ def read_test_data_file(file_path: str) -> Tuple[List[str] | None, Dict | None]:
 			data_file = json.load(file)
 			return data_file.get("datasets", []), data_file.get("skippable", {})
 	except FileNotFoundError:
-		logger(yellow("No skippable tests file found, running all."))
+		logger(logger.yellow("No skippable tests file found, running all."))
 		return None, None
 	except PermissionError:
 		logger.log_error(f"ERROR: Permission denied to open file '{file_path}'.")
