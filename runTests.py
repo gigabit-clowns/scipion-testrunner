@@ -5,6 +5,8 @@ import sys
 import json
 import os
 
+from .scipion import test_getter
+
 ################################## UTILS FUNCTIONS ##################################
 def colorStr(string, color):
 	""" This function returns the input string wrapped in the specified color. """
@@ -116,38 +118,6 @@ def testPythonCommand(scipion, pythonCommand):
 	return bool(result.returncode)
 
 ################################## MAIN EXECUTION FUNCTIONS ##################################
-def getAllTests(scipion, pluginModule, testPrefix):
-	""" This function finds the full list of tests from a given module. """
-	# Construct the test discovery command
-	command = f"{scipion} test --grep {pluginModule}"
-
-	# Run the shell command and capture the output
-	try:
-		output = subprocess.check_output(command, shell=True, text=True)
-	except subprocess.CalledProcessError:
-		printFatalError("ERROR: Test search command failed. Check line above for more detailed info.")
-
-	# Define test command string variables
-	scipionTestsStartingSpaces = '   '
-
-	# Separate lines into a list
-	lines = output.split('\n')
-
-	# For each line, keep only the ones about individual tests in a reduced form
-	filteredLines = []
-	for line in lines:
-		if line.startswith(scipionTestsStartingSpaces):
-			filteredLines.append(line.replace(f'{scipionTestsStartingSpaces}scipion3 {testPrefix}', ''))
-	
-	# If no tests were found, check if module was not found or if plugin has no tests
-	if not filteredLines:
-		# If import caused an error, module was not found
-		if not testPythonCommand(scipion, f"import {pluginModule}"):
-			printFatalError(f"ERROR: No tests were found for module {pluginModule}. Are you sure this module is properly installed?")
-	
-	# Return full list of tests
-	return filteredLines
-
 def readTestDataFile(testDataFilePath):
 	"""
 	This function returns a list with the necessary datasets for the tests, as well as
@@ -287,14 +257,12 @@ def printSummary(results):
 ################################## MAIN FUNCTION ##################################
 def main(args):
 	""" Main execution function. """
-	# Defining test prefix
-	testPrefix = f'tests {args.plugin}.tests.'
-
-	# Getting full list of tests
-	filteredLines = getAllTests(args.scipion, args.plugin, testPrefix)
+	filtered_lines = test_getter.getAllTests(args['scipion'], args['plugin'], f'tests {args['plugin']}.tests.')
+	print(filtered_lines)
+	sys.exit(0)
 
 	# If test list is empty, plugin has no tests
-	if not filteredLines:
+	if not filtered_lines:
 		# This case is considered a sucess since nothing actually failed
 		printAndFlush(colorStr(f"Module {args.plugin} has not tests. Nothing to run.", color='yellow'))
 		sys.exit(0)
@@ -308,7 +276,7 @@ def main(args):
 		otherSkippableTests = allSkippableTests.get('others', [])
 
 		# Removing skippable tests
-		filteredLines = removeSkippableTests(args.scipion, filteredLines, args.noGPU, gpuSkippableTests, dependenciesSkippableTests, otherSkippableTests)
+		filtered_lines = removeSkippableTests(args.scipion, filtered_lines, args.noGPU, gpuSkippableTests, dependenciesSkippableTests, otherSkippableTests)
 
 	# Downloading in parallel required datasets if there are any
 	if datasets:
@@ -319,14 +287,14 @@ def main(args):
 			printFatalError("The download of at least one dataset ended with errors. Exiting.")
 
 	# Showing initial message with number of tests
-	nJobs = len(filteredLines) if len(filteredLines) < args.jobs else args.jobs
-	printAndFlush(colorStr(f"Running a total of {len(filteredLines)} tests for {args.plugin} in batches of {nJobs} processes...", color='yellow'))
+	nJobs = len(filtered_lines) if len(filtered_lines) < args.jobs else args.jobs
+	printAndFlush(colorStr(f"Running a total of {len(filtered_lines)} tests for {args.plugin} in batches of {nJobs} processes...", color='yellow'))
 
 	# Run all the tests in parallel
-	failedTests = runInParallel(runTest, args.scipion, testPrefix, paramList=filteredLines, jobs=args.jobs)
+	failedTests = runInParallel(runTest, args.scipion, testPrefix, paramList=filtered_lines, jobs=args.jobs)
 
 	# Get results grouped by orogin file and separated into passed and failed
-	results = getResultDictionary(filteredLines, failedTests)
+	results = getResultDictionary(filtered_lines, failedTests)
 
 	# Print summary of passed/failed tests
 	printSummary(results)
