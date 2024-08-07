@@ -15,7 +15,6 @@ def read_test_data_file(file_path: str) -> Tuple[List[str] | None, Dict | None]:
 	- (tuple[list[str] | None, dict | None]): Tuple containing the list of 
 	datasets to download and skippable tests 
 	"""
-	logger(f"TEST: \"{file_path}\"")
 	try:
 		with open(file_path, 'r') as file:
 			data_file = json.load(file)
@@ -23,6 +22,8 @@ def read_test_data_file(file_path: str) -> Tuple[List[str] | None, Dict | None]:
 	except FileNotFoundError:
 		logger(logger.yellow("No skippable tests file found, running all."))
 		return None, None
+	except IsADirectoryError:
+		logger.log_error(f"ERROR: Path '{file_path}' provided is a directory.")
 	except PermissionError:
 		logger.log_error(f"ERROR: Permission denied to open file '{file_path}'.")
 	except json.JSONDecodeError as e:
