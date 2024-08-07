@@ -50,7 +50,7 @@ class Logger:
 		- text (str): Error message to show.
 		- ret_code (int): Optional. Return code to end the exection with.
 		"""
-		self.__call__(red(self.__remove_non_printable(text)))
+		self.__call__(self.red(self.__remove_non_printable(text)))
 		sys.exit(ret_code)
 
 	def green(self, text: str) -> str:
@@ -123,7 +123,7 @@ class Logger:
 		#### Returns:
 		- (str): Text without format.
 		"""
-		for formatting_char in __FORMATTING_CHARACTERS:
+		for formatting_char in self.__FORMATTING_CHARACTERS:
 			text = text.replace(formatting_char, "")
 		return text
 
