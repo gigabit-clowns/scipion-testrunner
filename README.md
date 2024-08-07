@@ -1,4 +1,4 @@
-# Scipion testrunner
+# Scipion test runner
 A module designed to handle in an efficient way the execution of Scipion tests.
 This module, even if it can be used locally as a user-friendly way of running all the tests of a specific plugin in parallel while avoiding cluttering the terminal, it has been designed for CI/CD processes.
 
