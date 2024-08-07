@@ -1,7 +1,7 @@
 from ..shell import shell_service
 from ..logger import logger
 
-def getAllTests(scipion: str, plugin_module: str, test_prefix: str):
+def get_all_tests(scipion: str, plugin_module: str, test_prefix: str):
 	"""
 	### Finds the full list of tests from a given module
 
