@@ -3,7 +3,7 @@ from typing import Tuple, List, Dict
 
 from ..application.logger import logger
 
-def read_test_data_file(file_path: str) -> Tuple[List[str] | None, Dict | None]:
+def read_test_data_file(file_path: str) -> Tuple[List[str], Dict]:
 	"""
 	### Returns a list with the necessary datasets for the tests, as well as 
 	### an object with the different tests and the situations where to skip them.
@@ -12,16 +12,18 @@ def read_test_data_file(file_path: str) -> Tuple[List[str] | None, Dict | None]:
 	- file_path (str): Path to the test data json file.
 
 	#### Returns:
-	- (tuple[list[str] | None, dict | None]): Tuple containing the list of 
+	- (tuple[list[str], dict]): Tuple containing the list of 
 	datasets to download and skippable tests 
 	"""
+	if not file_path:
+		logger(logger.yellow("No skippable tests file provided, running all."))
+		return [], {}
 	try:
 		with open(file_path, 'r') as file:
 			data_file = json.load(file)
 			return data_file.get("datasets", []), data_file.get("skippable", {})
 	except FileNotFoundError:
-		logger(logger.yellow("No skippable tests file found, running all."))
-		return None, None
+		logger.log_error(f"ERROR: File '{file_path}' does not exist.")
 	except IsADirectoryError:
 		logger.log_error(f"ERROR: Path '{file_path}' provided is a directory.")
 	except PermissionError:
