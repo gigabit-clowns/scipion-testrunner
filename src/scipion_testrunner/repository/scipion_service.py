@@ -42,6 +42,8 @@ def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]
 		line = line.lstrip()
 		if line.startswith(leading_chars):
 			tests.append(line.replace(leading_chars, ''))
+	logger(f"RAW TEXT: {command_text}")
+	logger(f"ALL TESTS: {tests}\n\n\n\n\n")
 	return tests
 
 def __get_scipion_test_search_param(scipion: str, plugin_module: str) -> str:
