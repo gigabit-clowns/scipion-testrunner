@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from ..application.logger import logger
 from . import shell_service, python_service
@@ -41,6 +41,16 @@ def download_datasets(scipion: str, datasets: List[str]):
 	if failed_downloads:
 		logger.log_error("The download of at least one dataset ended with errors. Exiting.")
 
+def run_tests(scipion: str, tests: List[str], dependant_tests: Dict):
+	"""
+	### Runs the given list of tests
+
+	#### Params:
+	- scipion (str): Path to Scipion's executable
+	- tests (list[str]): List of tests to run
+	- dependant_tests (dict): Internal depedencies between tests
+	"""
+
 def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]:
 	"""
 	### Return the list of tests given a command text
@@ -54,7 +64,7 @@ def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]
 	"""
 	lines = command_text.split('\n')
 	tests = []
-	leading_chars = __get_test_leading_chars(plugin_module)
+	leading_chars = __get_full_test_leading_chars(plugin_module)
 	for line in lines:
 		line = line.lstrip()
 		if __is_test_line(line, plugin_module):
@@ -81,7 +91,19 @@ def __get_test_leading_chars(plugin_module: str) -> str:
 	#### Returns:
 	- (str): Leading characters of test strings
 	"""
-	return f'scipion3 tests {plugin_module}.tests.'
+	return f'tests {plugin_module}.tests.'
+
+def __get_full_test_leading_chars(plugin_module: str) -> str:
+	"""
+	### Returns the leading characters of every full test string
+
+	#### Params:
+	- plugin_module (str): Module name of the plugin to obtain tests from
+
+	#### Returns:
+	- (str): Leading characters of full test strings
+	"""
+	return f'scipion3 {__get_test_leading_chars(plugin_module)}'
 
 def __is_test_line(line: str, plugin_module: str) -> bool:
 	"""
@@ -94,7 +116,7 @@ def __is_test_line(line: str, plugin_module: str) -> bool:
 	#### Returns:
 	- (bool): True if the line corresponds to a test, False otherwise
 	"""
-	if not line.startswith(__get_test_leading_chars(plugin_module)):
+	if not line.startswith(__get_full_test_leading_chars(plugin_module)):
 		return False
 	test_class = line.split(".")[-1]
 	return test_class.startswith("Test")
