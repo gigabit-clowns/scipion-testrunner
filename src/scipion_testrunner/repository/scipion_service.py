@@ -39,8 +39,7 @@ def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]
 	tests = []
 	leading_chars = __get_test_leading_chars(plugin_module)
 	for line in lines:
-		line = line.lstrip()
-		if line.startswith(leading_chars):
+		if __is_test_line(line, plugin_module):
 			tests.append(line.replace(leading_chars, ''))
 	logger(f"RAW TEXT: {command_text}")
 	logger(f"ALL TESTS: {tests}\n\n\n\n\n")
@@ -67,3 +66,20 @@ def __get_test_leading_chars(plugin_module: str) -> str:
 	- (str): Leading characters of test strings
 	"""
 	return f'scipion3 tests {plugin_module}.tests.'
+
+def __is_test_line(line: str, plugin_module: str) -> bool:
+	"""
+	### Checks if the given line corresponds to a test
+
+	#### Params:
+	- line (str): Line to check
+	- plugin_module (str): Module name of the plugin to obtain tests from
+
+	#### Returns:
+	- (bool): True if the line corresponds to a test, False otherwise
+	"""
+	line = line.lstrip()
+	if not line.startswith(__get_test_leading_chars(plugin_module)):
+		return False
+	test_class = line.split(".")[-1]
+	return test_class.startswith("Test")
