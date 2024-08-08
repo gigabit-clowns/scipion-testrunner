@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from ..application.logger import logger
 from . import shell_service, python_service
@@ -99,7 +99,7 @@ def __is_test_line(line: str, plugin_module: str) -> bool:
 	test_class = line.split(".")[-1]
 	return test_class.startswith("Test")
 
-def __download_dataset(scipion: str, dataset: str) -> str | None:
+def __download_dataset(scipion: str, dataset: str) -> Optional[str]:
 	"""
 	### Downloads the given dataset
 
