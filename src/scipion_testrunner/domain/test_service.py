@@ -66,20 +66,43 @@ def __remove_dependency_tests(test_list: List[str], dependency_test_list: List[D
     for dependency in dependency_test_list:
         plugin_name = dependency.get('name')
         module_name = dependency.get('module')
+        is_plugin = dependency.get('isPlugin', True)
         if module_name and python_service.exists_python_module(module_name):
             continue
         for dependency_test in dependency.get("tests", []):
             if dependency_test in test_list:
-                __log_skip_dependency_test(dependency_test, plugin_name)
+                __log_skip_dependency_test(dependency_test, plugin_name, is_plugin=is_plugin)
                 test_list.remove(dependency_test)
     return test_list
 
 def __log_skip_gpu_test(test_name: str):
+    """
+    ### Logs the removal of a GPU-based test
+
+    #### Params:
+    - test_name (str): Name of the test to skip
+    """
     __log_skip_test(test_name, "Needs GPU")
 
-def __log_skip_dependency_test(test_name: str, dependency: str):
-    dependency_name_message = f"with plugin {dependency}" if dependency else ""
+def __log_skip_dependency_test(test_name: str, dependency: str, is_plugin: bool=True):
+    """
+    ### Logs the removal of a dependency-based test
+
+    #### Params:
+    - test_name (str): Name of the test to skip
+    - dependency (str): Name of the plugin or module the test deppends on
+    - is_plugin (bool): If True, the package is a plugin. Otherwise, is a regular python package.
+    """
+    package_type = 'plugin' if is_plugin else 'package'
+    dependency_name_message = f"with {package_type} {dependency}" if dependency else ""
     __log_skip_test(test_name, f"Unmet dependency{dependency_name_message}")
 
 def __log_skip_test(test_name: str, custom_text: str):
+    """
+    ### Logs the removal of a test
+
+    #### Params:
+    - test_name (str): Name of the test to skip
+    - custom_text (str): Custom reason why the test is being skipped
+    """
     logger.log_warning(f"Skipping test {test_name}. Reason: {custom_text}.")
