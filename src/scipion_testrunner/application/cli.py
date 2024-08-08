@@ -21,6 +21,7 @@ def __generate_parser() -> argparse.ArgumentParser:
 	epilog = "Example 1: python -m scipion-testrunner /path/to/scipion myModule -j 2"
 	epilog += f"\nExample 2: python -m scipion-testrunner /path/to/scipion myModule --{__NO_GPU_PARAM_NAME}"
 	return argparse.ArgumentParser(
+		prog="scipion_testrunner",
 		epilog=epilog,
 		formatter_class=argparse.RawDescriptionHelpFormatter
 	)
@@ -65,7 +66,3 @@ def main():
 	parser = __add_params(parser)
 	args = __get_args_from_parser(parser)
 	test_service.test_scipion_plugin(args)
-
-
-if __name__ == "__main__":
-	main()
