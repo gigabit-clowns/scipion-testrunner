@@ -99,13 +99,13 @@ def __is_test_line(line: str, plugin_module: str) -> bool:
 	test_class = line.split(".")[-1]
 	return test_class.startswith("Test")
 
-def __download_dataset(scipion: str, dataset: str) -> Optional[str]:
+def __download_dataset(dataset: str, scipion: str) -> Optional[str]:
 	"""
 	### Downloads the given dataset
 
 	#### Params:
-	- scipion (str): Path to Scipion's executable
 	- dataset (str): Dataset to download
+	- scipion (str): Path to Scipion's executable
 	"""
 	logger.log_warning(f"Downloading dataset {dataset}...")
 	ret_code, output = shell_service.run_shell_command(f"{scipion} testdata --download {dataset}")
