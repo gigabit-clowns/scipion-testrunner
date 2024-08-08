@@ -39,6 +39,7 @@ def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]
 	tests = []
 	leading_chars = __get_test_leading_chars(plugin_module)
 	for line in lines:
+		line = line.lstrip()
 		if __is_test_line(line, plugin_module):
 			tests.append(line.replace(leading_chars, ''))
 	logger(f"RAW TEXT: {command_text}")
@@ -78,7 +79,6 @@ def __is_test_line(line: str, plugin_module: str) -> bool:
 	#### Returns:
 	- (bool): True if the line corresponds to a test, False otherwise
 	"""
-	line = line.lstrip()
 	if not line.startswith(__get_test_leading_chars(plugin_module)):
 		return False
 	test_class = line.split(".")[-1]
