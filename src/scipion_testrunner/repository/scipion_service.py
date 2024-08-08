@@ -24,6 +24,23 @@ def get_all_tests(scipion: str, plugin_module: str):
 	
 	return test_list
 
+def download_datasets(scipion: str, datasets: List[str]):
+	"""
+	### Downloads the given list of datasets
+
+	#### Params:
+	- scipion (str): Path to Scipion's executable
+	- datasets (list[str]): List of datasets to download
+	"""
+	logger(logger.blue(f"Downloading {len(datasets)} datasets..."))
+	failed_downloads = python_service.run_function_in_parallel(
+		__download_dataset,
+		scipion,
+		parallelizable_params=datasets
+	)
+	if failed_downloads:
+		logger.log_error("The download of at least one dataset ended with errors. Exiting.")
+
 def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]:
 	"""
 	### Return the list of tests given a command text
@@ -81,3 +98,19 @@ def __is_test_line(line: str, plugin_module: str) -> bool:
 		return False
 	test_class = line.split(".")[-1]
 	return test_class.startswith("Test")
+
+def __download_dataset(scipion: str, dataset: str) -> str | None:
+	"""
+	### Downloads the given dataset
+
+	#### Params:
+	- scipion (str): Path to Scipion's executable
+	- dataset (str): Dataset to download
+	"""
+	logger.log_warning(f"Downloading dataset {dataset}...")
+	ret_code, output = shell_service.run_shell_command(f"{scipion} testdata --download {dataset}")
+	if ret_code:
+		logger(logger.red(f"{output}\nDataset {dataset} download failed with the above message."))
+		return dataset
+	else:
+		logger(logger.green(f"Dataset {dataset} download OK"))
