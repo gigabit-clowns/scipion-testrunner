@@ -1,3 +1,4 @@
+import os
 from subprocess import Popen, PIPE
 from typing import Tuple
 
@@ -12,7 +13,7 @@ def run_shell_command(cmd: str) -> Tuple[int, str]:
 	- (int): Return code.
 	- (str): Output of the command, regardless of if it is an error or regular output.
 	"""
-	process = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
+	process = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True, env=os.environ)
 	process.wait()
 	
 	ret_code = process.returncode
