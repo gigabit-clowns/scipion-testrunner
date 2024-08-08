@@ -12,7 +12,7 @@ def run_tests(args: Dict):
             {'name': 'scipion-chem', 'module': 'pwchem', 'tests': tests[:5]}
         ],
         'others': [
-            {'test': tests[6], 'reason': "Just testing if it works"}
+            {'name': tests[6], 'reason': "Just testing if it works"}
         ]
     } # TEST
     tests = __remove_skippable_tests(tests, skippable_tests, args['noGpu'])
