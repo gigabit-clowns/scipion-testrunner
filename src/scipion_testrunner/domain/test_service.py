@@ -4,7 +4,7 @@ from typing import Dict, List
 from ..application.logger import logger
 from ..repository import scipion_service, file_service, python_service
 
-def run_tests(args: Dict):
+def test_scipion_plugin(args: Dict):
 	tests = scipion_service.get_all_tests(args['scipion'], args['plugin'])
 	if not tests:
 		logger.log_warning(f"Module {args['plugin']} has not tests. Nothing to run.")
@@ -14,9 +14,9 @@ def run_tests(args: Dict):
 	if not tests:
 		logger.log_warning("There are no tests left. Nothing to run.")
 		sys.exit(0)
-	data_sets = ["model_building_tutorial", "smallMolecules"]
-	logger(f"DATA SETS: {data_sets}")
+	data_sets = ["model_building_tutorial", "smallMolecules"] # Test
 	scipion_service.download_datasets(args['scipion'], data_sets)
+	scipion_service.run_tests(args['scipion'], tests)
 
 def __remove_skippable_tests(tests: List[str], skippable_tests: Dict, no_gpu: bool) -> List[str]:
 	"""
