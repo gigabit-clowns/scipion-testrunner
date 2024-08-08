@@ -16,7 +16,7 @@ def get_all_tests(scipion: str, plugin_module: str):
 	"""
 	ret_code, output = shell_service.run_shell_command(__get_scipion_test_search_param(scipion, plugin_module))
 	if ret_code:
-		logger.log_error(output)
+		logger.log_error(f"{output}\nERROR: Test search command failed. Check line above for more detailed info.")
 
 	test_list = __get_test_list_from_str(output, plugin_module)
 	if not test_list and not python_service.exists_python_module(plugin_module):
