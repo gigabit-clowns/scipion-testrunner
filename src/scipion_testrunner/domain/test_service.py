@@ -7,9 +7,10 @@ def run_tests(args: Dict):
     test_list = scipion_service.get_all_tests(args['scipion'], args['plugin'])
     data_sets, skippable_tests = file_service.read_test_data_file(args['testData'])
     logger(f"FULL TESTS: {test_list}")
-    skippable_tests = {'gpu': test_list[:5]} # TEST
+    skippable_tests = {'dependencies': [
+        {'name': 'scipion-chem', 'module': 'pwchem', 'tests': test_list[:5]}
+    ]} # TEST
     test_list = __remove_skippable_tests(test_list, skippable_tests, args['noGpu'])
-    logger(f"SKIPPABLE TESTS: {skippable_tests}")
     logger(f"FULL REMAINING TESTS: {test_list}")
     logger(f"DATA SETS: {data_sets}")
     import sys
