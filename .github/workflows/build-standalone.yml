@@ -40,3 +40,6 @@ jobs:
       
       - name: Use CLI as Python module
         run: poetry run python -m scipion_testrunner -h
+      
+      - name: Run unitary tests
+        run: python -m pytest -v --cache-clear --cov --cov-config=./conf/.coveragerc --junitxml=report.xml --cov-report xml --cov-report term
