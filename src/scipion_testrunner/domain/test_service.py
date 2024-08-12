@@ -14,7 +14,7 @@ def test_scipion_plugin(args: Dict):
 	if not tests:
 		logger.log_warning("There are no tests left. Nothing to run.")
 		sys.exit(0)
-	data_sets = ["model_building_tutorial", "smallMolecules"] # Test
+	data_sets = ["smallMolecules"] # Test
 	scipion_service.download_datasets(args['scipion'], data_sets)
 	scipion_service.run_tests(args['scipion'], tests, dependant_tests)
 
