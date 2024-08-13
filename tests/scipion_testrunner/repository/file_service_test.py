@@ -1,5 +1,4 @@
 import json
-import os
 from io import BytesIO
 from unittest.mock import patch
 
@@ -20,7 +19,7 @@ __LOG_FILE = BytesIO(json.dumps(__FILE_DATA).encode())
 
 def test_returns_empty_fields(__mock_log):
   assert (
-    file_service.read_test_data_file("") == [], {}, {}
+    file_service.read_test_data_file("") == ([], {}, {})
   ), "Empty file path should have returned empty fields."
 
 def test_returns_expected_fields(__mock_open):
@@ -44,7 +43,7 @@ def test_exits_on_permission_error(__mock_open_raise_permission_error, __mock_lo
   with pytest.raises(SystemExit):
     file_service.read_test_data_file(__DUMMY_FILE_PATH)
 
-def test_exits_on_json_decode_error(__mock_open, __mock_json_load_raise_exception, __mock_log):
+def test_exits_on_json_decode_error(__mock_open_wrong_file, __mock_log):
   with pytest.raises(SystemExit):
     file_service.read_test_data_file(__DUMMY_FILE_PATH)
 
@@ -76,10 +75,8 @@ def __mock_open_raise_permission_error(__mock_open):
   __mock_open.side_effect = PermissionError()
 
 @pytest.fixture
-def __mock_json_load_raise_exception():
-  with patch("json.load") as mock_method:
-    mock_method.side_effect = json.JSONDecodeError("Test", "", 1)
-    yield mock_method
+def __mock_open_wrong_file(__mock_open):
+  __mock_open.return_value = BytesIO("['a', 'b']".encode())
 
 @pytest.fixture
 def __mock_open_raise_exception(__mock_open):
