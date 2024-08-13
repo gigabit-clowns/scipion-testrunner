@@ -43,7 +43,7 @@ jobs:
       
       - name: Run unitary tests
         env:
-          SCRIPT_PATH: scripts/run-tests.sh
+          SCRIPT_PATH: ./scripts/run-tests.sh
         run: |
           chmod +x $SCRIPT_PATH
           poetry run $SCRIPT_PATH

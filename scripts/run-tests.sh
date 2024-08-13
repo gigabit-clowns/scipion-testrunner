@@ -1,3 +1,5 @@
+#!/bin/bash
+
 [[ "${DEBUG}" == 'true' ]] && set -o xtrace
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}")" && pwd )"
