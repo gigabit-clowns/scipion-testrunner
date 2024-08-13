@@ -4,7 +4,7 @@ from typing import Tuple
 
 def run_shell_command(cmd: str) -> Tuple[int, str]:
 	"""
-	### This function runs the given command in a shell.
+	### Runs the given command in a shell.
 
 	#### Params:
 	- cmd (str): Command to run.
