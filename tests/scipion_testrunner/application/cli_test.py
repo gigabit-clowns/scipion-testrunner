@@ -1,3 +1,4 @@
+import multiprocessing
 import os
 import sys
 from unittest.mock import patch
@@ -9,6 +10,13 @@ from scipion_testrunner.application import cli
 __SCIPION = '/path/to/scipion'
 __PLUGIN = 'myplugin'
 __ARGS = ['', __SCIPION, __PLUGIN]
+__ARGS_DICT = {
+  'scipion': __SCIPION,
+  'plugin': __PLUGIN,
+  'jobs': multiprocessing.cpu_count(),
+  'noGpu': False,
+  'testData': ''
+}
 
 def test_calls_required_parse_args_function(__mock_parse_args, __mock_test_service):
   cli.main()
@@ -26,26 +34,15 @@ def test_calls_required_test_service_function(__mock_parse_args, __mock_test_ser
   ]
 )
 def test_generates_expected_args(param_name, value, __mock_test_service):
-  args = {
-    'scipion': __SCIPION,
-    'plugin': __PLUGIN,
-    'jobs': 12,
-    'noGpu': False,
-    'testData': ''
-  }
+  args = __ARGS_DICT.copy()
   args[param_name] = value
   with patch.object(sys, 'argv', [*__ARGS, f"--{param_name}", f"{value}"]):
     cli.main()
     __mock_test_service.assert_called_once_with(args)
 
 def test_generates_expected_no_gpu_arg(__mock_test_service):
-  args = {
-    'scipion': __SCIPION,
-    'plugin': __PLUGIN,
-    'jobs': 12,
-    'noGpu': True,
-    'testData': ''
-  }
+  args = __ARGS_DICT.copy()
+  args['noGpu'] = True
   with patch.object(sys, 'argv', [*__ARGS, "--noGpu"]):
     cli.main()
     __mock_test_service.assert_called_once_with(args)
@@ -60,7 +57,7 @@ def test_generates_expected_no_gpu_arg(__mock_test_service):
 )
 def test_returns_error_when_not_providing_required_params(input_args, __mock_test_service):
   with patch.object(sys, 'argv', input_args):
-    with pytest.raises(SystemExit) as wrapped_exit:
+    with pytest.raises(SystemExit):
       cli.main()
 
 @pytest.fixture
