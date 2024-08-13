@@ -41,9 +41,9 @@ def test_returns_expected_status_when_testing_python_command(return_code, succee
     pytest.param([False, False], 2)
   ]
 )
-def test_returns_expected_statuses_when_running_parallel_function():
+def test_returns_expected_statuses_when_running_parallel_function(params, n_errors):
   assert (
-    len(python_service.run_function_in_parallel(__return_expected_code, parallelizable_params=[True, True])) == 0
+    len(python_service.run_function_in_parallel(__return_expected_code, parallelizable_params=params)) == n_errors
   ), "Parallel function call returned different number of errors than expected."
 
 def __return_expected_code(success: bool) -> int:
