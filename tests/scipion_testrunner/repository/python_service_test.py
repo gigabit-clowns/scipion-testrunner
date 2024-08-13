@@ -20,17 +20,30 @@ def test_returns_expected_value_when_checking_if_module_exists(exists, message_f
   ), f"Function returns that module {message_fragment}."
 
 @pytest.mark.parametrize(
-  "return_code,suceeded,message_fragment",
+  "return_code,succeeded,message_fragment",
   [
     pytest.param(0, True, "did not suceed"),
-    pytest.param(1, False, "suceeded")
+    pytest.param(1, False, "succeeded")
   ]
 )
-def test_returns_expected_status_when_testing_python_command(return_code, suceeded, message_fragment, __mock_run_shell_command):
+def test_returns_expected_status_when_testing_python_command(return_code, succeeded, message_fragment, __mock_run_shell_command):
   __mock_run_shell_command.return_value = return_code, ""
   assert (
-    python_service.python_command_succeeded("test-command") == suceeded
+    python_service.python_command_succeeded("test-command") == succeeded
   ), f"Command {message_fragment}."
+
+
+def __return_expected_code(success: bool) -> int:
+  """
+  ### Returns the associated code to the given success state.
+
+  #### Params:
+  - success (bool): Defines the success state of the output.
+
+  #### Returns:
+  - (int): Return code associated to the given success state.
+  """
+  return 1 if success else 0
 
 @pytest.fixture
 def __mock_python_command_succeeded():
