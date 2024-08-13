@@ -1,6 +1,7 @@
 import argparse
 import multiprocessing
 import os
+from typing import Dict
 
 from scipion_testrunner.domain import test_service
 
@@ -10,7 +11,7 @@ __JOBS_PARAM_NAME = "jobs"
 __NO_GPU_PARAM_NAME = "noGpu"
 __TEST_DATA_PARAM_NAME = "testData"
 
-def __generate_parser():
+def __generate_parser() -> argparse.ArgumentParser:
 	"""
 	### Generates an argument parser for the test runner
 
@@ -20,12 +21,13 @@ def __generate_parser():
 	epilog = "Example 1: python -m scipion-testrunner /path/to/scipion myModule -j 2"
 	epilog += f"\nExample 2: python -m scipion-testrunner /path/to/scipion myModule --{__NO_GPU_PARAM_NAME}"
 	return argparse.ArgumentParser(
+		prog="scipion_testrunner",
 		epilog=epilog,
 		formatter_class=argparse.RawDescriptionHelpFormatter
 	)
 
 
-def __add_params(parser: argparse.ArgumentParser):
+def __add_params(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
 	"""
 	### Inserts the params into the given parser
 
@@ -43,7 +45,7 @@ def __add_params(parser: argparse.ArgumentParser):
 	return parser
 
 
-def __get_args_from_parser(parser: argparse.ArgumentParser):
+def __get_args_from_parser(parser: argparse.ArgumentParser) -> Dict:
 	"""
 	### Extracts the appropiate values from the given parser
 
@@ -63,8 +65,4 @@ def main():
 	parser = __generate_parser()
 	parser = __add_params(parser)
 	args = __get_args_from_parser(parser)
-	test_service.run_tests(args)
-
-
-if __name__ == "__main__":
-	main()
+	test_service.test_scipion_plugin(args)

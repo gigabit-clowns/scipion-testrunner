@@ -42,6 +42,15 @@ class Logger:
 		if self.__log_file is not None:
 			print(self.__remove_non_printable(text), file=self.__log_file, flush=True)
 
+	def log_warning(self, text: str):
+		"""
+		### Prints a warning message.
+
+		#### Params:
+		- text (str): Warning message to show.
+		"""
+		self.__call__(self.yellow(self.__remove_non_printable(text)))
+
 	def log_error(self, text: str, ret_code: int=1):
 		"""
 		### Prints an error message and stops exection.

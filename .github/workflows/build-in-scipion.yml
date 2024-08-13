@@ -39,4 +39,4 @@ jobs:
       
       - name: Run scipion-em tests
         working-directory: ${{ github.workspace }}/../
-        run: scipion-testrunner ./scipion/scipion3 pwem --noGpu
+        run: scipion_testrunner ./scipion/scipion3 pwem --noGpu
