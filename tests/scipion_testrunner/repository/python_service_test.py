@@ -32,6 +32,19 @@ def test_returns_expected_status_when_testing_python_command(return_code, succee
     python_service.python_command_succeeded("test-command") == succeeded
   ), f"Command {message_fragment}."
 
+@pytest.mark.parametrize(
+  "params,n_errors",
+  [
+    pytest.param([True, True], 0),
+    pytest.param([False, True], 1),
+    pytest.param([True, False], 1),
+    pytest.param([False, False], 2)
+  ]
+)
+def test_returns_expected_statuses_when_running_parallel_function():
+  assert (
+    len(python_service.run_function_in_parallel(__return_expected_code, parallelizable_params=[True, True])) == 0
+  ), "Parallel function call returned different number of errors than expected."
 
 def __return_expected_code(success: bool) -> int:
   """
