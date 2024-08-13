@@ -40,22 +40,22 @@ def test_logger_is_called_with_expected_text_when_logging_error(__mock_print, __
   __mock_print.assert_called_with(logger.red(__TEST_STRING), flush=True)
 
 @pytest.mark.parametrize(
-    "function_name,starting_formatting_character",
+    "color_method,starting_formatting_character",
     [
-      pytest.param("green", __GREEN),
-      pytest.param("yellow", __YELLOW),
-      pytest.param("red", __RED),
-      pytest.param("blue", __BLUE),
-      pytest.param("bold", __BOLD)
+      pytest.param(Logger.green, __GREEN),
+      pytest.param(Logger.yellow, __YELLOW),
+      pytest.param(Logger.red, __RED),
+      pytest.param(Logger.blue, __BLUE),
+      pytest.param(Logger.bold, __BOLD)
     ]
 )
 def test_returns_expected_formatted_text(
-  function_name,
+  color_method,
   starting_formatting_character,
   __mock_logger_format_attributes
 ):
   logger = Logger()
-  assert getattr(logger, function_name)(__TEST_STRING) == f"{starting_formatting_character}{__TEST_STRING}{__END_FORMAT}"
+  assert color_method(logger, __TEST_STRING) == f"{starting_formatting_character}{__TEST_STRING}{__END_FORMAT}"
 
 @pytest.fixture
 def __mock_print():
