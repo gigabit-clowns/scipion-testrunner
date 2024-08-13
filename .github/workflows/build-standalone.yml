@@ -42,4 +42,8 @@ jobs:
         run: poetry run python -m scipion_testrunner -h
       
       - name: Run unitary tests
-        run: poetry run ./scripts/run-tests.sh
+        env:
+          SCRIPT_PATH: ./scripts/run-tests.sh
+        run: |
+          chmod +x $SCRIPT_PATH
+          poetry run $SCRIPT_PATH
