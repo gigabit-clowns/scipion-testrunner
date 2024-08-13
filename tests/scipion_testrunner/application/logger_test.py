@@ -23,10 +23,21 @@ def test_logger_is_called_with_expected_text_when_logging_to_stdout(__mock_print
   logger = Logger()
   logger(__TEST_STRING)
   __mock_print.assert_called_once_with(__TEST_STRING, flush=True)
+
+def test_logger_is_called_with_expected_formatted_text_when_logging_to_stdout(__mock_print):
+  logger = Logger()
+  logger(logger.green(__TEST_STRING))
+  __mock_print.assert_called_once_with(logger.green(__TEST_STRING), flush=True)
 def test_logger_is_called_with_expected_text_when_logging_to_file(__mock_print, __mock_open):
   logger = Logger()
   logger.start_log_file("")
   logger(__TEST_STRING)
+  __mock_print.assert_called_with(__TEST_STRING, flush=True, file=__LOG_FILE)
+
+def test_logger_is_called_with_expected_non_formatted_text_when_logging_to_file(__mock_print, __mock_open):
+  logger = Logger()
+  logger.start_log_file("")
+  logger(logger.green(__TEST_STRING))
   __mock_print.assert_called_with(__TEST_STRING, flush=True, file=__LOG_FILE)
 
 def test_logger_is_called_with_expected_text_when_logging_warning(__mock_print):
