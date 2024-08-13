@@ -78,7 +78,7 @@ def __mock_open_raise_permission_error(__mock_open):
 @pytest.fixture
 def __mock_json_load_raise_exception():
   with patch("json.load") as mock_method:
-    mock_method.side_effect = json.JSONDecodeError("", "", 0)
+    mock_method.side_effect = json.JSONDecodeError("Test", "", 1)
     yield mock_method
 
 @pytest.fixture
