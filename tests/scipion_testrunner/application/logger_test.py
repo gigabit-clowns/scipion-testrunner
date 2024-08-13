@@ -86,7 +86,7 @@ def test_returns_expected_formatted_text(
   __mock_logger_format_attributes
 ):
   logger = Logger()
-  assert color_method(logger, __TEST_STRING) == f"{starting_formatting_character}{__TEST_STRING}{__END_FORMAT}"
+  assert color_method(logger, __TEST_STRING) == f"{starting_formatting_character}{__TEST_STRING}{__END_FORMAT}", "Color format has not been properly set."
 
 @pytest.fixture
 def __mock_print():
