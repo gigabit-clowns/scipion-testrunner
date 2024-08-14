@@ -1,3 +1,4 @@
+from typing import Callable, List
 from unittest.mock import patch
 
 import pytest
@@ -78,6 +79,40 @@ def test_exits_with_error_when_downloading_datasets(__mock_print, __mock_run_fun
     flush=True
   )
 
+def test_shows_expected_individual_download_warning_when_downloading_dataset(
+  __mock_print,
+  __mock_log_warning,
+  __mock_run_shell_command
+):
+  __mock_run_shell_command.return_value = (0, "")
+  scipion_service.__download_dataset(__DATASETS[0], __SCIPION)
+  __mock_log_warning.assert_called_once_with(f"Downloading dataset {__DATASETS[0]}...")
+
+def test_exits_with_error_when_downloading_individual_dataset(
+  __mock_print,
+  __mock_log_warning,
+  __mock_run_shell_command
+):
+  failure_message = "Test fail"
+  __mock_run_shell_command.return_value = (1, failure_message)
+  scipion_service.__download_dataset(__DATASETS[0], __SCIPION)
+  __mock_print.assert_called_once_with(
+    logger.red(f"{failure_message}\nDataset {__DATASETS[0]} download failed with the above message."),
+    flush=True
+  )
+
+def test_shows_expected_individual_download_success_message_when_downloading_individual_dataset(
+  __mock_print,
+  __mock_log_warning,
+  __mock_run_shell_command
+):
+  __mock_run_shell_command.return_value = (0, "")
+  scipion_service.__download_dataset(__DATASETS[0], __SCIPION)
+  __mock_print.assert_called_once_with(
+    logger.green(f"Dataset {__DATASETS[0]} download OK"),
+    flush=True
+  )
+
 @pytest.fixture
 def __mock_run_shell_command():
   with patch("scipion_testrunner.repository.shell_service.run_shell_command") as mock_method:
@@ -96,4 +131,9 @@ def __mock_exists_module():
 @pytest.fixture
 def __mock_run_function_in_parallel():
   with patch("scipion_testrunner.repository.python_service.run_function_in_parallel") as mock_method:
+    yield mock_method
+
+@pytest.fixture
+def __mock_log_warning():
+  with patch("scipion_testrunner.application.logger.Logger.log_warning") as mock_method:
     yield mock_method
