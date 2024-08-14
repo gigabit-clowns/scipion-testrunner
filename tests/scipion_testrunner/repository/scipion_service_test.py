@@ -1,4 +1,3 @@
-from typing import Callable, List
 from unittest.mock import patch
 
 import pytest
