@@ -42,7 +42,7 @@ def run_function_in_parallel(func: Callable, *args, parallelizable_params: List[
 	"""
 	jobs = len(parallelizable_params) if len(parallelizable_params) < max_jobs else max_jobs
 	pool = multiprocessing.Pool(processes=jobs)
-	results = [pool.apply_async(func, args=(param,*args,)) for param in parallelizable_params]
+	results = [pool.apply_async(func, args=(param,*args)) for param in parallelizable_params]
 	failed_commands = []
 	for result in results:
 		if result.get():
