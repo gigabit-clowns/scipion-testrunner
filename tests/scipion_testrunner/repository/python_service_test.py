@@ -1,3 +1,4 @@
+from typing import Callable, Optional
 from unittest.mock import patch
 
 import pytest
@@ -41,22 +42,47 @@ def test_returns_expected_status_when_testing_python_command(return_code, succee
     pytest.param([False, False], 2)
   ]
 )
-def test_returns_expected_statuses_when_running_parallel_function(params, n_errors):
+def test_returns_expected_statuses_when_running_parallel_function(params, n_errors, __mock_pool_apply):
   assert (
-    len(python_service.run_function_in_parallel(__return_expected_code, parallelizable_params=params)) == n_errors
+    len(python_service.run_function_in_parallel(ExitState, parallelizable_params=params)) == n_errors
   ), "Parallel function call returned different number of errors than expected."
 
-def __return_expected_code(success: bool) -> int:
+class ExitState:
   """
-  ### Returns the associated code to the given success state.
+  ### Mock substitute for multiprocessing.pool.AsyncResult.
+  """
+  def __init__(self, success: bool):
+    """
+    ### Constructor
+
+    #### Params:
+    - success (bool): Success state of the faked operation.
+    """
+    self.success = success
+  
+  def get(self) -> Optional[str]:
+    """
+    ### Returns a message if the state of the fake operation is failure.
+
+    #### Returns:
+    - (str | None): Message if the sate is a failure.
+    """
+    if not self.success:
+      return "Failed"
+
+def __run_function_async(func: Callable, args):
+  """
+  ### Calls the received callable with given args.
 
   #### Params:
-  - success (bool): Defines the success state of the output.
+  - func (callable): Callable to run.
+  - args (Any): Args to be passed on to the callable.
 
   #### Returns:
-  - (int): Return code associated to the given success state.
+  - (Any): Output of the callable.
   """
-  return 1 if success else 0
+  all_params = [*args]
+  return func(args[0], *all_params[1:])
 
 @pytest.fixture
 def __mock_python_command_succeeded():
@@ -66,4 +92,10 @@ def __mock_python_command_succeeded():
 @pytest.fixture
 def __mock_run_shell_command():
   with patch("scipion_testrunner.repository.shell_service.run_shell_command") as mock_method:
+    yield mock_method
+
+@pytest.fixture
+def __mock_pool_apply():
+  with patch("multiprocessing.pool.Pool.apply_async") as mock_method:
+    mock_method.side_effect = __run_function_async
     yield mock_method
