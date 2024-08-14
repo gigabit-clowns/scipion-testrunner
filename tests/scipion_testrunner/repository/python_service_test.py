@@ -109,15 +109,6 @@ class PoolMock:
     """
     return func(args[0], *args[1:])
 
-  def get_processes(self) -> int:
-    """
-    ### Retrieves the number of processes.
-
-    #### Returns:
-    - (int): Number of processes.
-    """
-    return self.processes
-  
   def close(self):
     """
     ### Overrides the pool close function.
