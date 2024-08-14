@@ -27,6 +27,7 @@ Scanning tests...
  scipion3 tests {__MODULE}.tests.workflows.test_workflow_xmipp
    scipion3 tests {__MODULE}.tests.workflows.test_workflow_xmipp.TestXmippWorkflow
 """
+__DATASETS = ["dataset_1", "dataset_2"]
 
 def test_exists_with_error_when_test_search_fails(__mock_run_shell_command, __mock_print):
   error_text = "Test fail"
@@ -60,6 +61,23 @@ def test_returns_expected_test_list(__mock_run_shell_command, __mock_exists_modu
     ]
   )
 
+def test_prints_starting_message_when_downloading_datasets(__mock_print, __mock_run_function_in_parallel):
+  __mock_run_function_in_parallel.return_value = []
+  scipion_service.download_datasets(__SCIPION, __DATASETS)
+  __mock_print.assert_called_once_with(
+    logger.blue(f"Downloading {len(__DATASETS)} datasets..."),
+    flush=True
+  )
+
+def test_exits_with_error_when_downloading_datasets(__mock_print, __mock_run_function_in_parallel):
+  __mock_run_function_in_parallel.return_value = [True]
+  with pytest.raises(SystemExit):
+    scipion_service.download_datasets(__SCIPION, __DATASETS)
+  __mock_print.assert_called_with(
+    logger.red("The download of at least one dataset ended with errors. Exiting."),
+    flush=True
+  )
+
 @pytest.fixture
 def __mock_run_shell_command():
   with patch("scipion_testrunner.repository.shell_service.run_shell_command") as mock_method:
@@ -73,4 +91,9 @@ def __mock_print():
 @pytest.fixture
 def __mock_exists_module():
   with patch("scipion_testrunner.repository.python_service.exists_python_module") as mock_method:
+    yield mock_method
+
+@pytest.fixture
+def __mock_run_function_in_parallel():
+  with patch("scipion_testrunner.repository.python_service.run_function_in_parallel") as mock_method:
     yield mock_method
