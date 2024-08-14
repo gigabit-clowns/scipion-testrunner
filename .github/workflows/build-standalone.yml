@@ -42,4 +42,8 @@ jobs:
         run: poetry run python -m scipion_testrunner -h
       
       - name: Run unitary tests
-        run: poetry run python -m pytest -v --cache-clear --cov --cov-config=./conf/.coveragerc --junitxml=report.xml --cov-report xml --cov-report term
+        env:
+          SCRIPT_PATH: ./scripts/run-tests.sh
+        run: |
+          chmod +x $SCRIPT_PATH
+          poetry run $SCRIPT_PATH
