@@ -1,4 +1,3 @@
-import multiprocessing.pool
 from typing import Callable, Optional, Tuple
 from unittest.mock import patch
 
