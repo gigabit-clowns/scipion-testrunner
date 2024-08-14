@@ -1,4 +1,4 @@
-import multiprocessing
+import multiprocessing.pool
 from typing import Callable, Optional, Tuple
 from unittest.mock import patch
 
@@ -59,10 +59,7 @@ def test_returns_expected_statuses_when_running_parallel_function(params, n_erro
 )
 def test_pool_is_created_with_expected_jobs(param_len, max_jobs, expected_jobs, __mock_pool):
   python_service.run_function_in_parallel(ExitState, parallelizable_params=['True' for _ in range(param_len)], max_jobs=max_jobs)
-  assert (
-    #__mock_pool.assert_called_once_with(processes=expected_jobs)
-    __mock_pool.assert_called()
-  ), "The pool was not created with the expected amount of jobs."
+  __mock_pool.assert_called_once_with(processes=expected_jobs)
 
 class ExitState:
   """
@@ -111,8 +108,7 @@ class PoolMock:
     #### Returns:
     - (Any): Output of the callable.
     """
-    remaining_params = [*args]
-    return func(args[0], *remaining_params[1:])
+    return func(args[0], *args[1:])
 
   def get_processes(self) -> int:
     """
@@ -147,5 +143,6 @@ def __mock_run_shell_command():
 
 @pytest.fixture
 def __mock_pool():
-  with patch.object(multiprocessing, "Pool", PoolMock) as mock_object:
-    yield mock_object
+  with patch("multiprocessing.Pool") as mock_method:
+    mock_method.side_effect = PoolMock
+    yield mock_method
