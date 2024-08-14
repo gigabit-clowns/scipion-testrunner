@@ -48,20 +48,15 @@ def test_returns_expected_statuses_when_running_parallel_function(params, n_erro
 
 def __return_expected_code(success: bool) -> int:
   """
-  ### Returns 0 or raises an exception depending on the status received.
+  ### Returns the associated code to the given success state.
 
   #### Params:
   - success (bool): Defines the success state of the output.
 
   #### Returns:
-  - (int): 0 if the state recived is success.
-
-  #### Raises:
-  - (Exception): Raised when the status received is not a success.
+  - (int): Return code associated to the given success state.
   """
-  if success:
-    return 0
-  raise Exception("Function failed.")
+  return 1 if success else 0
 
 @pytest.fixture
 def __mock_python_command_succeeded():
