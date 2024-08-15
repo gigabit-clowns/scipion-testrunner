@@ -98,3 +98,13 @@ def __mock_read_test_data_file():
 def __mock_remove_skippable_tests():
 	with patch("scipion_testrunner.domain.test_service.__remove_skippable_tests") as mock_method:
 		yield mock_method
+
+@pytest.fixture
+def __mock_download_datasets():
+	with patch("scipion_testrunner.repository.scipion_service.download_datasets") as mock_method:
+		yield mock_method
+
+@pytest.fixture
+def __mock_run_tests():
+	with patch("scipion_testrunner.repository.scipion_service.run_tests") as mock_method:
+		yield mock_method
