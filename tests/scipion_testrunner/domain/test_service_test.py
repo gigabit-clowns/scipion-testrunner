@@ -169,15 +169,18 @@ def test_logs_skipping_dependency_test_with_expected_args(name, is_plugin, __moc
 	__mock_log_skip_dependency_test.assert_called_once_with(test_to_remove, name, is_plugin=is_plugin)
 
 @pytest.mark.parametrize(
-	"exist,remaining_tests",
+	"exist,to_remove,remaining_tests",
 	[
-		pytest.param([True, False], [__TESTS[0], *__TESTS[2:]]),
-		pytest.param([True, True], __TESTS),
-		pytest.param([False, False], __TESTS[2:])
+		pytest.param([True, False], __TESTS[:2], [__TESTS[0], *__TESTS[2:]]),
+		pytest.param([True, True], __TESTS[:2], __TESTS),
+		pytest.param([False, False], __TESTS[:2], __TESTS[2:]),
+		pytest.param([True], ["non_existent"], __TESTS),
+		pytest.param([False], ["non_existent"], __TESTS)
 	]
 )
 def test_removes_expected_dependency_tests(
 	exist,
+	to_remove,
 	remaining_tests,
 	__mock_log_skip_dependency_test
 ):
@@ -188,7 +191,7 @@ def test_removes_expected_dependency_tests(
 		'module': 'test_module',
 		'isPlugin': True,
 		'tests': [test]
-	} for test in __TESTS[:2]]
+	} for test in to_remove]
 	with patch(
 		"scipion_testrunner.repository.python_service.exists_python_module",
 		new=mock_exists_python_module
