@@ -44,7 +44,7 @@ def test_exits_success_when_there_are_not_tests(__mock_get_all_tests, __mock_log
 
 def test_logs_warning_when_there_are_not_tests(__mock_get_all_tests, __mock_log_warning):
 	__mock_get_all_tests.return_value = []
-	with pytest.raises(SystemExit) as exit_status:
+	with pytest.raises(SystemExit):
 		test_service.test_scipion_plugin(__ARGS)
 	__mock_log_warning.assert_called_once_with(f"Module {__PLUGIN} has not tests. Nothing to run.")
 
@@ -68,7 +68,7 @@ def test_logs_warning_when_all_tests_get_removed(
 ):
 	__mock_read_test_data_file.return_value = ([], {}, {})
 	__mock_remove_skippable_tests.return_value = []
-	with pytest.raises(SystemExit) as exit_status:
+	with pytest.raises(SystemExit):
 		test_service.test_scipion_plugin(__ARGS)
 	__mock_log_warning.assert_called_once_with("There are no tests left. Nothing to run.")
 
