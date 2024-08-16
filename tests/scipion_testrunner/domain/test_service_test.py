@@ -86,6 +86,18 @@ def test_calls_download_datasets(
 	test_service.test_scipion_plugin(__ARGS)
 	__mock_download_datasets.assert_called_once_with(__SCIPION, __DATASETS)
 
+def test_not_calls_download_datasets(
+	__mock_get_all_tests,
+	__mock_read_test_data_file,
+	__mock_remove_skippable_tests,
+	__mock_download_datasets,
+	__mock_run_tests
+):
+	__mock_read_test_data_file.return_value = ([], __SKIPPABLE, __INTERNAL_DEPENDENCIES)
+	__mock_remove_skippable_tests.return_value = __TESTS
+	test_service.test_scipion_plugin(__ARGS)
+	__mock_download_datasets.assert_not_called()
+
 def test_calls_run_tests(
 	__mock_get_all_tests,
 	__mock_read_test_data_file,

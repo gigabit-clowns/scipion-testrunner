@@ -14,7 +14,8 @@ def test_scipion_plugin(args: Dict):
 	if not tests:
 		logger.log_warning("There are no tests left. Nothing to run.")
 		sys.exit(0)
-	scipion_service.download_datasets(args['scipion'], data_sets)
+	if data_sets:
+		scipion_service.download_datasets(args['scipion'], data_sets)
 	scipion_service.run_tests(args['scipion'], tests, dependant_tests)
 
 def __remove_skippable_tests(tests: List[str], skippable_tests: Dict, no_gpu: bool) -> List[str]:
