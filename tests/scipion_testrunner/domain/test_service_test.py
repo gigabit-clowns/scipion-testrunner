@@ -317,6 +317,34 @@ def test_logs_expected_internal_dependency_test_removal(__mock_log_skip_test):
 		f"Missing dependency with tests: '{non_existing_test}'"
 	)
 
+@pytest.mark.parametrize(
+	"test_name,dependencies,expected_path",
+	[
+		pytest.param(__TESTS[0], {}, []),
+		pytest.param(__TESTS[0], {__TESTS[0]: ["random_test"]}, []),
+		pytest.param(
+			__TESTS[0],
+			{__TESTS[0]: [__TESTS[-1]], __TESTS[-1]: [__TESTS[0]]},
+			[__TESTS[0], __TESTS[-1], __TESTS[0]]
+		),
+		pytest.param(
+			__TESTS[0],
+			{__TESTS[1]: [__TESTS[-1]], __TESTS[-1]: [__TESTS[1]]},
+			[]
+		),
+		pytest.param(
+			__TESTS[0],
+			{__TESTS[0]: [__TESTS[1]], __TESTS[1]: [__TESTS[-1]], __TESTS[-1]: [__TESTS[1]]},
+			[__TESTS[1], __TESTS[-1], __TESTS[1]]
+		),
+		pytest.param(__TESTS[0], {__TESTS[0]: [__TESTS[0]]}, [__TESTS[0], __TESTS[0]])
+	]
+)
+def test_returns_expected_circular_dependencies(test_name, dependencies, expected_path):
+	assert (
+		test_service.__find_circular_dependency(test_name, dependencies) == expected_path
+	), "Received circular dependency path was not expected"
+
 @pytest.fixture
 def __mock_get_all_tests():
 	with patch("scipion_testrunner.repository.scipion_service.get_all_tests") as mock_method:
