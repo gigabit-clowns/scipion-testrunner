@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from ..application.logger import logger
 from ..repository import scipion_service, file_service, python_service
@@ -9,14 +9,15 @@ def test_scipion_plugin(args: Dict):
 	if not tests:
 		logger.log_warning(f"Module {args['plugin']} has not tests. Nothing to run.")
 		sys.exit(0)
-	data_sets, skippable_tests, dependant_tests = file_service.read_test_data_file(args['testData'])
+	data_sets, skippable_tests, tests_with_deps = file_service.read_test_data_file(args['testData'])
 	tests = __remove_skippable_tests(tests, skippable_tests, args['noGpu'])
 	if not tests:
 		logger.log_warning("There are no tests left. Nothing to run.")
 		sys.exit(0)
 	if data_sets:
 		scipion_service.download_datasets(args['scipion'], data_sets)
-	scipion_service.run_tests(args['scipion'], tests, dependant_tests)
+	tests, tests_with_deps = __remove_unmet_internal_dependency_tests(tests, tests_with_deps)
+	scipion_service.run_tests(args['scipion'], tests, tests_with_deps)
 
 def __remove_skippable_tests(tests: List[str], skippable_tests: Dict, no_gpu: bool) -> List[str]:
 	"""
@@ -126,4 +127,33 @@ def __log_skip_test(test_name: str, custom_text: str):
 	- test_name (str): Name of the test to skip
 	- custom_text (str): Custom reason why the test is being skipped
 	"""
-	logger.log_warning(f"Skipping test {test_name}. Reason: {custom_text}.")
+	reason_text = f"Reason: {custom_text}" if custom_text else "No reason provided"
+	logger.log_warning(f"Skipping test {test_name}. {reason_text}.")
+
+def __remove_unmet_internal_dependency_tests(tests: List[str], tests_with_deps: Dict[str, List[str]]) -> Tuple[List[str], Dict[str, List[str]]]:
+	"""
+	### Removes all the tests that have unmet dependencies
+
+	#### Params:
+	- tests (list[str]): Full list of tests
+	- tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies
+
+	#### Returns:
+	- (list[str]): All remaining tests
+	- (dict[str, list[str]]): Remaining tests with their met dependencies
+	"""
+	has_been_modified = False
+	for test, deps in list(tests_with_deps.items()):
+		non_met_deps = list(set(deps) - set(tests))
+		if non_met_deps:
+			has_been_modified = True
+			del tests_with_deps[test]
+			if test in tests:
+				non_met_deps_text = f"'{non_met_deps[0]}'" if len(non_met_deps) == 1 else  ", ".join([
+					f"'{test}'" for test in non_met_deps
+				])
+				__log_skip_test(test, f"Missing dependency with tests: {non_met_deps_text}")
+				tests.remove(test)
+	if has_been_modified:
+		return __remove_unmet_internal_dependency_tests(tests, tests_with_deps)
+	return tests, tests_with_deps
