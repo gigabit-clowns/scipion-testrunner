@@ -306,15 +306,21 @@ def test_removes_expected_internal_dependency_tests(
 		)[0] == expected_tests
 	), "Removed different number of tests than expected."
 
-def test_logs_expected_internal_dependency_test_removal(__mock_log_skip_test):
-	non_existing_test = "my_random_test"
+@pytest.mark.parametrize(
+	"tests,tests_text",
+	[
+		pytest.param(["my_random_test"], "'my_random_test'"),
+		pytest.param(["random_1", "random_2"], "'random_1', 'random_2'")
+	]
+)
+def test_logs_expected_internal_dependency_test_removal(tests, tests_text, __mock_log_skip_test):
 	test_service.__remove_unmet_internal_dependency_tests(
 		__TESTS.copy(),
-		{__TESTS[0]: [non_existing_test]}
+		{__TESTS[0]: tests}
 	)
 	__mock_log_skip_test.assert_called_once_with(
 		__TESTS[0],
-		f"Missing dependency with tests: '{non_existing_test}'"
+		f"Missing dependency with tests: {tests_text}"
 	)
 
 @pytest.mark.parametrize(
