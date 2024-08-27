@@ -112,7 +112,7 @@ def __remove_unmet_internal_dependency_tests(tests: List[str], tests_with_deps: 
 	"""
 	has_been_modified = False
 	for test, deps in list(tests_with_deps.items()):
-		non_met_deps = list(set(deps) - set(tests))
+		non_met_deps = [element for element in deps if element in list(set(deps) - set(tests))]
 		if non_met_deps:
 			has_been_modified = True
 			del tests_with_deps[test]
