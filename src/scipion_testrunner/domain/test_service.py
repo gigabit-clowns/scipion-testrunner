@@ -11,6 +11,7 @@ def test_scipion_plugin(args: Dict):
 		sys.exit(0)
 	data_sets, skippable_tests, tests_with_deps = file_service.read_test_data_file(args['testData'])
 	tests = __remove_skippable_tests(tests, skippable_tests, args['noGpu'])
+	tests, tests_with_deps = __remove_circular_dependencies(tests, tests_with_deps)
 	tests, tests_with_deps = __remove_unmet_internal_dependency_tests(tests, tests_with_deps)
 	if not tests:
 		logger.log_warning("There are no tests left. Nothing to run.")
@@ -159,21 +160,49 @@ def __log_skip_test(test_name: str, custom_text: str):
 	logger.log_warning(f"Skipping test {test_name}. {reason_text}.")
 
 def __remove_circular_dependencies(tests: List[str], tests_with_deps: Dict[str, List[str]]) -> Tuple[List[str], Dict[str, List[str]]]:
-	for test in tests_with_deps.keys():
-		circular_path = __find_circular_dependency(test, tests_with_deps)
-		if circular_path:
-			del tests_with_deps[test]
-			if test in tests:
-				__log_skip_test(test, f"It has a circular dependency: {' --> '.join(circular_path)}")
-				tests.remove(test)
-	return tests, tests_with_deps
+	"""
+	### Removes all the tests that are within a circular dependency
 
-def __remove_circular_dependency(test_name: str, tests: List[str], tests_with_deps: Dict[str, List[str]]) -> Tuple[List[str], Dict[str, List[str]]]:
-	deps = tests_with_deps[test_name]
-	del tests_with_deps[test_name]
-	if test_name in tests:
-		#__log_skip_test(test_name, f"It has a circular dependency: {' --> '.join(deps)}")
-		tests.remove(test_name)
+	#### Params:
+	- tests (list[str]): Full list of tests
+	- tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies
+
+	#### Returns:
+	- (list[str]): All remaining tests
+	- (dict[str, list[str]]): Remaining tests without circular dependencies
+	"""
+	non_circular = {}
+	while tests_with_deps:
+		test_name = list(tests_with_deps.keys())[0]
+		circular_path = __find_circular_dependency(test_name, tests_with_deps)
+		if not circular_path:
+			non_circular[test_name] = tests_with_deps[test_name]
+			del tests_with_deps[test_name]
+		else:
+			tests, tests_with_deps = __remove_circular_dependency(tests, tests_with_deps, circular_path)
+	return tests, non_circular
+
+def __remove_circular_dependency(tests: List[str], tests_with_deps: Dict[str, List[str]], circular_path: List[str]) -> Tuple[List[str], Dict[str, List[str]]]:
+	"""
+	### Removes all the tests that are within the given circular dependency
+
+	#### Params:
+	- tests (list[str]): Full list of tests
+	- tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies
+	- circular_path (list[str]): List of tests that form the circular dependency
+
+	#### Returns:
+	- (list[str]): All remaining tests
+	- (dict[str, list[str]]): Remaining tests without circular dependencies
+	"""
+	for _ in range(len(circular_path) - 1):
+		test_name = circular_path[0]
+		del tests_with_deps[test_name]
+		if test_name in tests:
+			__log_skip_test(test_name, f"It has a circular dependency: {' --> '.join(circular_path)}")
+			tests.remove(test_name)
+		circular_path = circular_path[1:] + [circular_path[1]]
+	return tests, tests_with_deps
 
 def __find_circular_dependency(test_name: str, tests_with_deps: Dict[str, List[str]], path: List[str]=None) -> List[str]:
 	"""
