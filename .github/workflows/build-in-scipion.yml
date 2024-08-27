@@ -9,6 +9,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+        with:
+          ref: ${{ github.head_ref }}
+
       - name: Enable Pull Request Automerge
         if: github.event_name == 'pull_request'
         env:
@@ -34,11 +39,6 @@ jobs:
         run: |
           pip install --user scipion-installer
           python -m scipioninstaller -conda -noXmipp -noAsk scipion
-
-      - name: Checkout repository
-        uses: actions/checkout@main
-        with:
-          ref: ${{ github.head_ref }}
 
       - name: Install project
         run: pip install -e .
