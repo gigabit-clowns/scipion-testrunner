@@ -1,0 +1,23 @@
+{
+  "datasets": [
+    "xmipp_tutorial",
+    "grigorieff",
+    "eman",
+    "movies",
+    "mda",
+    "ribo_movies",
+    "relion_tutorial",
+    "emx",
+    "initial_volume",
+    "particles",
+    "groel",
+    "resmap",
+    "rct"
+  ],
+  "skippable": {
+    "gpu": [],
+    "dependencies": [],
+    "others": []
+  },
+  "test-dependencies": {}
+}

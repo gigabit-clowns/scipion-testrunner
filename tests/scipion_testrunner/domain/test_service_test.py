@@ -21,7 +21,7 @@ __TESTS = [f"test_{i}" for i in range(10)]
 __GPU_KEY = "gpu"
 __DEPENDENCIES_KEY = "dependencies"
 __OTHERS_KEY = "others"
-__SKIPPABLE_GPU = ["test_1", "test_2"]
+__SKIPPABLE_GPU = __TESTS[:1]
 __SKIPPABLE_DEPENDENCIES = [
 	{"name": "testplugin", "module": "pluginmodule", "tests": ["test_5"]}
 ]
@@ -257,12 +257,125 @@ def test_logs_expected_message_when_skipping_dependency_test(
 	test_service.__log_skip_dependency_test(__TESTS[0], dependency_name, is_plugin=is_plugin)
 	__mock_log_skip_test.assert_called_once_with(__TESTS[0], f"Unmet dependency{message}")
 
-def test_logs_expected_warning_message_when_skipping_test(__mock_log_warning):
-	reason = "test_reason"
+@pytest.mark.parametrize(
+	"reason,reason_message",
+	[
+		pytest.param("test_reason", "Reason: test_reason"),
+		pytest.param("", "No reason provided"),
+		pytest.param(None, "No reason provided")
+	]
+)
+def test_logs_expected_warning_message_when_skipping_test(reason, reason_message, __mock_log_warning):
 	test_service.__log_skip_test(__TESTS[0], reason)
 	__mock_log_warning.assert_called_once_with(
-		f"Skipping test {__TESTS[0]}. Reason: {reason}."
+		f"Skipping test {__TESTS[0]}. {reason_message}."
 	)
+
+@pytest.mark.parametrize(
+	"tests_with_dependencies,expected_tests",
+	[
+		pytest.param({}, __TESTS),
+		pytest.param({__TESTS[0]: ["non_existent"]}, __TESTS[1:]),
+		pytest.param(
+			{__TESTS[0]: ["non_existent"], __TESTS[1]: [__TESTS[-1]]},
+			__TESTS[1:]
+		),
+		pytest.param(
+			{__TESTS[0]: ["non_existent"], __TESTS[1]: [__TESTS[0]]},
+			__TESTS[2:]
+		),
+		pytest.param(
+			{__TESTS[0]: [__TESTS[1]], __TESTS[1]: ["non_existent"]},
+			__TESTS[2:]
+		),
+		pytest.param(
+			{__TESTS[0]: ["non_existent"], __TESTS[1]: [__TESTS[0]], __TESTS[2]: [__TESTS[1]]},
+			__TESTS[3:]
+		)
+	]
+)
+def test_removes_expected_internal_dependency_tests(
+	tests_with_dependencies,
+	expected_tests,
+	__mock_log_skip_test
+):
+	assert (
+		test_service.__remove_unmet_internal_dependency_tests(
+			__TESTS.copy(),
+			tests_with_dependencies
+		)[0] == expected_tests
+	), "Removed different number of tests than expected."
+
+@pytest.mark.parametrize(
+	"tests,tests_text",
+	[
+		pytest.param(["my_random_test"], "'my_random_test'"),
+		pytest.param(["random_1", "random_2"], "'random_1', 'random_2'")
+	]
+)
+def test_logs_expected_internal_dependency_test_removal(tests, tests_text, __mock_log_skip_test):
+	test_service.__remove_unmet_internal_dependency_tests(
+		__TESTS.copy(),
+		{__TESTS[0]: tests}
+	)
+	__mock_log_skip_test.assert_called_once_with(
+		__TESTS[0],
+		f"Missing dependency with tests: {tests_text}"
+	)
+
+@pytest.mark.parametrize(
+	"test_name,dependencies,expected_path",
+	[
+		pytest.param(__TESTS[0], {}, []),
+		pytest.param(__TESTS[0], {__TESTS[0]: ["random_test"]}, []),
+		pytest.param(
+			__TESTS[0],
+			{__TESTS[0]: [__TESTS[-1]], __TESTS[-1]: [__TESTS[0]]},
+			[__TESTS[0], __TESTS[-1], __TESTS[0]]
+		),
+		pytest.param(
+			__TESTS[0],
+			{__TESTS[1]: [__TESTS[-1]], __TESTS[-1]: [__TESTS[1]]},
+			[]
+		),
+		pytest.param(
+			__TESTS[0],
+			{__TESTS[0]: [__TESTS[1]], __TESTS[1]: [__TESTS[-1]], __TESTS[-1]: [__TESTS[1]]},
+			[__TESTS[1], __TESTS[-1], __TESTS[1]]
+		),
+		pytest.param(__TESTS[0], {__TESTS[0]: [__TESTS[0]]}, [__TESTS[0], __TESTS[0]])
+	]
+)
+def test_returns_expected_circular_dependencies(test_name, dependencies, expected_path):
+	assert (
+		test_service.__find_circular_dependency(test_name, dependencies) == expected_path
+	), "Received circular dependency path was not expected"
+
+@pytest.mark.parametrize(
+	"dependencies,expected_tests",
+	[
+		pytest.param({}, __TESTS),
+		pytest.param({__TESTS[0]: [__TESTS[0]]}, __TESTS[1:]),
+		pytest.param({__TESTS[0]: [__TESTS[1]], __TESTS[1]: [__TESTS[0]]}, __TESTS[2:]),
+		pytest.param(
+			{__TESTS[0]: [__TESTS[1]], __TESTS[1]: [__TESTS[2]], __TESTS[2]: [__TESTS[1]]},
+			[__TESTS[0]] + __TESTS[3:]
+		)
+	]
+)
+def test_returns_expected_non_circular_dependency_tests(dependencies, expected_tests, __mock_log_skip_test):
+	assert (
+		test_service.__remove_circular_dependencies(__TESTS.copy(), dependencies)[0] == expected_tests
+	), "Received different tests than expected"
+
+def test_logs_expected_circular_dependency_message(__mock_log_skip_test):
+	test_service.__remove_circular_dependency(__TESTS.copy(), {__TESTS[0]: [__TESTS[0]]}, [__TESTS[0], __TESTS[0]])
+	__mock_log_skip_test.assert_called_once_with(__TESTS[0], f"It has a circular dependency: {__TESTS[0]} --> {__TESTS[0]}")
+
+def test_does_not_log_non_existing_tests_in_circular_path(__mock_log_skip_test):
+	test_name = "non_existent"
+	test_service.__remove_circular_dependency(__TESTS.copy(), {test_name: [test_name]}, [test_name, test_name])
+	__mock_log_skip_test.assert_not_called()
 
 @pytest.fixture
 def __mock_get_all_tests():
