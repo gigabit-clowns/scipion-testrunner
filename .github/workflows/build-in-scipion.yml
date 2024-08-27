@@ -9,6 +9,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Enable Pull Request Automerge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --merge --auto "1"
+
       - name: Install Miniconda
         uses: conda-incubator/setup-miniconda@main
         with:
