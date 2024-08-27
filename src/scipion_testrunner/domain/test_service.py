@@ -213,7 +213,7 @@ def __find_circular_dependency(test_name: str, tests_with_deps: Dict[str, List[s
 	- tests_with_deps (dict[str, list[str]]): Dictionary containing tests that depend on other tests.
 	- path (list[str]): Optional. List of tests that might form a circular dependency.
 
-	#### Return:
+	#### Returns:
 	- (list[str]): List with all the tests forming a circular path.
 	"""
 	path = [] if path is None else path
@@ -227,3 +227,28 @@ def __find_circular_dependency(test_name: str, tests_with_deps: Dict[str, List[s
 		if circular_path:
 			return circular_path
 	return []
+
+def __generate_sorted_test_batches(tests_with_deps: Dict[str, List[str]]) -> List[List[str]]:
+	test_batches = []
+	while tests_with_deps:
+		batch = __get_test_batch(tests_with_deps)
+		test_batches.append(batch)
+		for test in batch:
+			del tests_with_deps[test]
+	return test_batches
+
+def __get_test_batch(test_with_deps: Dict[str, List[str]]) -> List[str]:
+	"""
+	### Returns the next test batch to run given the dependencies between them.
+
+	#### Params:
+	- tests_with_deps (dict[str, list[str]]): Dictionary containing tests that depend on other tests.
+
+	#### Returns:
+	- (list[str]): Next test batch to run
+	"""
+	batch = []
+	for test, deps in list(test_with_deps.items()):
+		if not any(key in deps for key in test_with_deps.keys()):
+			batch.append(test)
+	return batch
