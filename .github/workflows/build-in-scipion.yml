@@ -18,9 +18,9 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --merge --auto "1"
+        run: gh pr merge --merge --auto "${{ github.event.number }}"  
 
-      - name: Install Miniconda
+      - name: Install Miniconda  
         uses: conda-incubator/setup-miniconda@main
         with:
           miniconda-version: "latest"
@@ -29,17 +29,17 @@ jobs:
           activate-environment: scipion3
           python-version: "3.8"
 
-      - name: Install Scipion's dependencies
+      - name: Install Scipion's dependencies    
         run: |
           sudo apt-get update
           sudo apt-get install -y wget gcc-10 g++-10 make cmake
       
-      - name: Install Scipion
+      - name: Install Scipion    
         working-directory: ${{ github.workspace }}/../
         run: |
           pip install --user scipion-installer
           python -m scipioninstaller -conda -noXmipp -noAsk scipion
-
+    
       - name: Install project
         run: pip install -e .
       
