@@ -345,6 +345,32 @@ def test_returns_expected_circular_dependencies(test_name, dependencies, expecte
 		test_service.__find_circular_dependency(test_name, dependencies) == expected_path
 	), "Received circular dependency path was not expected"
 
+@pytest.mark.parametrize(
+	"dependencies,expected_tests",
+	[
+		pytest.param({}, __TESTS),
+		pytest.param({__TESTS[0]: [__TESTS[0]]}, __TESTS[1:]),
+		pytest.param({__TESTS[0]: [__TESTS[1]], __TESTS[1]: [__TESTS[0]]}, __TESTS[2:]),
+		pytest.param(
+			{__TESTS[0]: [__TESTS[1]], __TESTS[1]: [__TESTS[2]], __TESTS[2]: [__TESTS[1]]},
+			[__TESTS[0]] + __TESTS[3:]
+		)
+	]
+)
+def test_returns_expected_non_circular_dependency_tests(dependencies, expected_tests, __mock_log_skip_test):
+	assert (
+		test_service.__remove_circular_dependencies(__TESTS.copy(), dependencies)[0] == expected_tests
+	), "Received different tests than expected"
+
+def test_logs_expected_circular_dependency_message(__mock_log_skip_test):
+	test_service.__remove_circular_dependency(__TESTS.copy(), {__TESTS[0]: [__TESTS[0]]}, [__TESTS[0], __TESTS[0]])
+	__mock_log_skip_test.assert_called_once_with(__TESTS[0], f"It has a circular dependency: {__TESTS[0]} --> {__TESTS[0]}")
+
+def test_does_not_log_non_existing_tests_in_circular_path(__mock_log_skip_test):
+	test_name = "non_existent"
+	test_service.__remove_circular_dependency(__TESTS.copy(), {test_name: [test_name]}, [test_name, test_name])
+	__mock_log_skip_test.assert_not_called()
+
 @pytest.fixture
 def __mock_get_all_tests():
 	with patch("scipion_testrunner.repository.scipion_service.get_all_tests") as mock_method:
