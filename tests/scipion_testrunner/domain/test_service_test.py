@@ -377,6 +377,29 @@ def test_does_not_log_non_existing_tests_in_circular_path(__mock_log_skip_test):
 	test_service.__remove_circular_dependency(__TESTS.copy(), {test_name: [test_name]}, [test_name, test_name])
 	__mock_log_skip_test.assert_not_called()
 
+@pytest.mark.parametrize(
+	"test_with_deps,expected_batch",
+	[
+		pytest.param(
+			{__TESTS[0]: [__TESTS[-1]], __TESTS[1]: [__TESTS[0]]},
+			[__TESTS[0]]
+		),
+		pytest.param(
+			{__TESTS[0]: [__TESTS[-1]], __TESTS[1]: [__TESTS[2]]},
+			[__TESTS[0], __TESTS[1]]
+		),
+		pytest.param(
+			{__TESTS[0]: [__TESTS[1]], __TESTS[1]: [__TESTS[0]]},
+			[]
+		),
+		pytest.param({__TESTS[0]: [__TESTS[0]]}, []),
+	]
+)
+def test_returns_expected_batch(test_with_deps, expected_batch):
+	assert (
+		test_service.__get_test_batch(test_with_deps) == expected_batch
+	), "Received different batch than expected"
+
 @pytest.fixture
 def __mock_get_all_tests():
 	with patch("scipion_testrunner.repository.scipion_service.get_all_tests") as mock_method:
