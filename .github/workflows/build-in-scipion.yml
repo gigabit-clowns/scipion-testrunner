@@ -43,5 +43,7 @@ jobs:
         run: pip install -e .
       
       - name: Run scipion-em tests
+        env:
+          TEST_MODULE: pwem
         working-directory: ${{ github.workspace }}/../
-        run: scipion_testrunner ./scipion/scipion3 pwem --noGpu --testData=${{ github.workspace }}/tests/pwem.json
+        run: scipion_testrunner ./scipion/scipion3 $TEST_MODULE --noGpu --testData=${{ github.workspace }}/tests/$TEST_MODULE.json
