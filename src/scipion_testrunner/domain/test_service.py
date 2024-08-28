@@ -27,6 +27,9 @@ def test_scipion_plugin(args: Dict):
 	tests, test_batches = __generate_sorted_test_batches(tests, tests_with_deps)
 	failed_tests = scipion_service.run_tests(args['scipion'], tests.copy(), test_batches)
 	__log_result_summary(__get_sorted_results(tests, failed_tests))
+	if failed_tests:
+		logger.log_error("Some tests ended with errors. Exiting.")
+	logger(logger.green("\nAll test passed!"))
 
 def __remove_skippable_tests(tests: List[str], skippable_tests: Dict, no_gpu: bool) -> List[str]:
 	"""
