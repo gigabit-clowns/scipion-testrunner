@@ -123,7 +123,7 @@ def test_logs_expected_messages_when_running_tests(__mock_print, __mock_run_test
   ]
   __mock_print.assert_has_calls(calls)
 
-def test_does_not_log_run_messages_when_running_tests(__mock_print):
+def test_does_not_log_run_messages_when_running_tests(__mock_print, __mock_run_test_batch):
   scipion_service.run_tests(__SCIPION, __TESTS, [], 2, __MODULE)
   __mock_print.assert_not_called()
 
