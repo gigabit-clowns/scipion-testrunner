@@ -26,7 +26,7 @@ def test_scipion_plugin(args: Dict):
 		scipion_service.download_datasets(args['scipion'], data_sets)
 	tests, test_batches = __generate_sorted_test_batches(tests, tests_with_deps)
 	failed_tests = scipion_service.run_tests(args['scipion'], tests.copy(), test_batches)
-	sorted_results = __get_sorted_results(tests, failed_tests)
+	__log_result_summary(__get_sorted_results(tests, failed_tests))
 
 def __remove_skippable_tests(tests: List[str], skippable_tests: Dict, no_gpu: bool) -> List[str]:
 	"""
@@ -313,3 +313,19 @@ def __group_tests_by_file(tests: List[str]) -> Dict[str, List[str]]:
 		origin_file, test_name = test.split('.', 1)
 		grouped_tests.setdefault(origin_file, []).append(test_name)
 	return grouped_tests
+
+def __log_result_summary(results: Dict[str, List[str]]):
+	"""
+	### Logs the result summary
+
+	#### Params:
+	- results (dict[str, list[str]]): Test results grouped by origin file and exit status
+	"""
+	logger("SUMMARY:")
+	for origin_file in results:
+		passed = results.get(origin_file, {}).get("passed", [])
+		failed = results.get(origin_file, {}).get("failed", [])
+		total = len(passed) + len(failed)
+		logger(f"{origin_file}: [{len(passed)} / {total}]")
+		if failed:
+			logger(logger.red(f"\tFailed tests: {' '.join(failed)}"))
