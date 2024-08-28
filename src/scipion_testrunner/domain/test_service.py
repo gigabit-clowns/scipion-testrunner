@@ -229,6 +229,17 @@ def __find_circular_dependency(test_name: str, tests_with_deps: Dict[str, List[s
 	return []
 
 def __generate_sorted_test_batches(tests: List[str], tests_with_deps: Dict[str, List[str]]) -> Tuple[List[str], List[List[str]]]:
+	"""
+	### Generates the list of test batches to be executed in order
+
+	#### Params:
+	- tests (list[str]): Full list of tests
+	- tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies
+
+	#### Returns:
+	- (list[str]): All remaining independent tests
+	- (list[list[str]]): List of test batches
+	"""
 	test_batches = []
 	while tests_with_deps:
 		batch = __get_test_batch(tests_with_deps)
