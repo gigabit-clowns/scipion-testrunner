@@ -4,6 +4,12 @@ from typing import Dict, List, Tuple
 from ..application.logger import logger
 from ..repository import scipion_service, file_service, python_service
 
+SCIPION_PARAM_NAME = "scipion"
+PLUGIN_PARAM_NAME = "plugin"
+JOBS_PARAM_NAME = "jobs"
+NO_GPU_PARAM_NAME = "noGpu"
+TEST_DATA_PARAM_NAME = "testData"
+
 def test_scipion_plugin(args: Dict):
 	"""
 	### Handles the full test execution of a Scipion plugin
@@ -11,21 +17,27 @@ def test_scipion_plugin(args: Dict):
 	#### Params:
 	- args (dict): Dictionary containing all the command-line args
 	"""
-	tests = scipion_service.get_all_tests(args['scipion'], args['plugin'])
+	tests = scipion_service.get_all_tests(args[SCIPION_PARAM_NAME], args[PLUGIN_PARAM_NAME])
 	if not tests:
-		logger.log_warning(f"Module {args['plugin']} has not tests. Nothing to run.")
+		logger.log_warning(f"Module {args[PLUGIN_PARAM_NAME]} has not tests. Nothing to run.")
 		sys.exit(0)
-	data_sets, skippable_tests, tests_with_deps = file_service.read_test_data_file(args['testData'])
-	tests = __remove_skippable_tests(tests, skippable_tests, args['noGpu'])
+	data_sets, skippable_tests, tests_with_deps = file_service.read_test_data_file(args[TEST_DATA_PARAM_NAME])
+	tests = __remove_skippable_tests(tests, skippable_tests, args[NO_GPU_PARAM_NAME])
 	tests, tests_with_deps = __remove_circular_dependencies(tests, tests_with_deps)
 	tests, tests_with_deps = __remove_unmet_internal_dependency_tests(tests, tests_with_deps)
 	if not tests:
 		logger.log_warning("There are no tests left. Nothing to run.")
 		sys.exit(0)
 	if data_sets:
-		scipion_service.download_datasets(args['scipion'], data_sets)
+		scipion_service.download_datasets(args[SCIPION_PARAM_NAME], data_sets)
 	tests, test_batches = __generate_sorted_test_batches(tests, tests_with_deps)
-	failed_tests = scipion_service.run_tests(args['scipion'], tests.copy(), test_batches)
+	failed_tests = scipion_service.run_tests(
+		args[SCIPION_PARAM_NAME],
+		tests.copy(),
+		test_batches,
+		args[JOBS_PARAM_NAME],
+		args[PLUGIN_PARAM_NAME]
+	)
 	__log_result_summary(__get_sorted_results(tests, failed_tests))
 	if failed_tests:
 		logger.log_error("Some tests ended with errors. Exiting.")
