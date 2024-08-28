@@ -228,10 +228,12 @@ def __find_circular_dependency(test_name: str, tests_with_deps: Dict[str, List[s
 			return circular_path
 	return []
 
-def __generate_sorted_test_batches(tests: List[str], tests_with_deps: Dict[str, List[str]]) -> List[List[str]]:
+def __generate_sorted_test_batches(tests: List[str], tests_with_deps: Dict[str, List[str]]) -> Tuple[List[str], List[List[str]]]:
 	test_batches = []
 	while tests_with_deps:
 		batch = __get_test_batch(tests_with_deps)
+		if not batch:
+			break
 		test_batches.append(batch)
 		for test in batch:
 			del tests_with_deps[test]
