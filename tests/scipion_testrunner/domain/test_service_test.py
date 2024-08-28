@@ -1,7 +1,8 @@
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, call
 
 import pytest
 
+from scipion_testrunner.application.logger import logger
 from scipion_testrunner.domain import test_service
 
 __SCIPION_KEY = "scipion"
@@ -83,7 +84,8 @@ def test_calls_download_datasets(
 	__mock_remove_unmet_internal_dependency_tests,
 	__mock_download_datasets,
 	__mock_run_tests,
-	__mock_get_sorted_results
+	__mock_get_sorted_results,
+	__mock_log_result_summary
 ):
 	__mock_remove_skippable_tests.return_value = __TESTS
 	test_service.test_scipion_plugin(__ARGS)
@@ -95,7 +97,8 @@ def test_not_calls_download_datasets(
 	__mock_remove_skippable_tests,
 	__mock_download_datasets,
 	__mock_run_tests,
-	__mock_get_sorted_results
+	__mock_get_sorted_results,
+	__mock_log_result_summary
 ):
 	__mock_read_test_data_file.return_value = ([], __SKIPPABLE, __INTERNAL_DEPENDENCIES)
 	__mock_remove_skippable_tests.return_value = __TESTS
@@ -112,11 +115,29 @@ def test_calls_run_tests(
 	__mock_generate_sorted_test_batches,
 	__mock_run_tests,
 	__mock_log_warning,
-	__mock_get_sorted_results
+	__mock_get_sorted_results,
+	__mock_log_result_summary
 ):
 	__mock_remove_skippable_tests.return_value = __TESTS.copy()
 	test_service.test_scipion_plugin(__ARGS)
 	__mock_run_tests.assert_called_once_with(__SCIPION, __TESTS, [])
+
+def test_calls_log_result_summary(
+	__mock_get_all_tests,
+	__mock_read_test_data_file,
+	__mock_remove_skippable_tests,
+	__mock_remove_circular_dependencies,
+	__mock_remove_unmet_internal_dependency_tests,
+	__mock_download_datasets,
+	__mock_generate_sorted_test_batches,
+	__mock_run_tests,
+	__mock_log_warning,
+	__mock_get_sorted_results,
+	__mock_log_result_summary
+):
+	__mock_remove_skippable_tests.return_value = __TESTS.copy()
+	test_service.test_scipion_plugin(__ARGS)
+	__mock_log_result_summary.assert_called_once_with(__mock_get_sorted_results.return_value)
 
 @pytest.mark.parametrize(
 	"called_function,params",
@@ -449,35 +470,59 @@ def test_returns_expected_sorted_batches(test_with_deps, expected_tests, expecte
 	), "Received different sorted batches than expected"
 
 def test_returns_expected_grouped_tests():
+	file1_name = "file1"
+	file2_name = "file2"
 	assert (
 		test_service.__group_tests_by_file(
-			["file1.test_1", "file1.test_2", "file2.test_1"]
+			[
+				f"{file1_name}.{__TESTS[0]}",
+				f"{file1_name}.{__TESTS[1]}",
+				f"{file2_name}.{__TESTS[0]}"
+			]
 		) == {
-			"file1": ["test_1", "test_2"],
-			"file2": ["test_1"]
+			file1_name: [__TESTS[0], __TESTS[1]],
+			file2_name: [__TESTS[0]]
 		}
 	), "Received different test grouping than expected"
 
 def test_returns_expected_sorted_results():
+	file1_name = "file1"
+	file2_name = "file2"
+	file3_name = "file3"
 	assert (
 		test_service.__get_sorted_results(
-			["file1.test_1", "file1.test_2", "file2.test_1", "file3.test_1"],
-			["file1.test_2", "file3.test_1"]
+			[
+				f"{file1_name}.{__TESTS[0]}",
+				f"{file1_name}.{__TESTS[1]}",
+				f"{file2_name}.{__TESTS[0]}",
+				f"{file3_name}.{__TESTS[0]}"
+			],
+			[f"{file1_name}.{__TESTS[1]}", f"{file3_name}.{__TESTS[0]}"]
 		) == {
-			"file1": {
-				"passed": ["test_1"],
-				"failed": ["test_2"]
-			},
-			"file2": {
-				"passed": ["test_1"],
-				"failed": []
-			},
-			"file3": {
-				"passed": [],
-				"failed": ["test_1"]
-			}
+			file1_name: {"passed": [__TESTS[0]], "failed": [__TESTS[1]]},
+			file2_name: {"passed": [__TESTS[0]], "failed": []},
+			file3_name: {"passed": [], "failed": [__TESTS[0]]}
 		}
 	), "Received different result order than expected"
+
+def test_logs_expected_messages_in_summary_report(__mock_print):
+	file1_name = "file1"
+	file2_name = "file2"
+	file3_name = "file3"
+	calls = [
+		call("SUMMARY:", flush=True),
+		call(f"{file1_name}: [1 / 3]", flush=True),
+		call(logger.red(f"\tFailed tests: {__TESTS[1]} {__TESTS[2]}"), flush=True),
+		call(f"{file2_name}: [1 / 1]", flush=True),
+		call(f"{file3_name}: [0 / 1]", flush=True),
+		call(logger.red(f"\tFailed tests: {__TESTS[0]}"), flush=True)
+	]
+	test_service.__log_result_summary({
+		file1_name: {"passed": [__TESTS[0]], "failed": [__TESTS[1], __TESTS[2]]},
+		file2_name: {"passed": [__TESTS[0]], "failed": []},
+		file3_name: {"passed": [], "failed": [__TESTS[0]]}
+	})
+	__mock_print.assert_has_calls(calls)
 
 @pytest.fixture
 def __mock_get_all_tests():
@@ -573,3 +618,18 @@ def __mock_get_sorted_results():
 	with patch("scipion_testrunner.domain.test_service.__get_sorted_results") as mock_method:
 		mock_method.return_value = {}
 		yield mock_method
+
+@pytest.fixture
+def __mock_print():
+  with patch("builtins.print") as mock_method:
+    yield mock_method
+
+@pytest.fixture
+def __mock_log_result_summary():
+	with patch("scipion_testrunner.domain.test_service.__log_result_summary") as mock_method:
+		yield mock_method
+
+@pytest.fixture
+def __mock_logger():
+  with patch("scipion_testrunner.application.logger.logger") as mock_method:
+    yield mock_method
