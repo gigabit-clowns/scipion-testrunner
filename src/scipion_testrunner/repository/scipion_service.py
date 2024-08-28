@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict
+from typing import List, Optional
 
 from ..application.logger import logger
 from . import shell_service, python_service
@@ -41,14 +41,14 @@ def download_datasets(scipion: str, datasets: List[str]):
 	if failed_downloads:
 		logger.log_error("The download of at least one dataset ended with errors. Exiting.")
 
-def run_tests(scipion: str, tests: List[str], dependant_tests: Dict):
+def run_tests(scipion: str, tests: List[str], test_batches: List[List[str]]):
 	"""
-	### Runs the given list of tests
+	### Runs the given tests
 
 	#### Params:
 	- scipion (str): Path to Scipion's executable
 	- tests (list[str]): List of tests to run
-	- dependant_tests (dict): Internal depedencies between tests
+	- test_batches (list[list[str]]): Test batches to run in order
 	"""
 
 def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]:
