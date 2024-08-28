@@ -5,6 +5,12 @@ from ..application.logger import logger
 from ..repository import scipion_service, file_service, python_service
 
 def test_scipion_plugin(args: Dict):
+	"""
+	### Handles the full test execution of a Scipion plugin
+
+	#### Params:
+	- args (dict): Dictionary containing all the command-line args
+	"""
 	tests = scipion_service.get_all_tests(args['scipion'], args['plugin'])
 	if not tests:
 		logger.log_warning(f"Module {args['plugin']} has not tests. Nothing to run.")
@@ -20,6 +26,7 @@ def test_scipion_plugin(args: Dict):
 		scipion_service.download_datasets(args['scipion'], data_sets)
 	tests, test_batches = __generate_sorted_test_batches(tests, tests_with_deps)
 	failed_tests = scipion_service.run_tests(args['scipion'], tests.copy(), test_batches)
+	sorted_results = __get_sorted_results(tests, failed_tests)
 
 def __remove_skippable_tests(tests: List[str], skippable_tests: Dict, no_gpu: bool) -> List[str]:
 	"""
@@ -268,3 +275,41 @@ def __get_test_batch(test_with_deps: Dict[str, List[str]]) -> List[str]:
 		if not any(key in deps for key in test_with_deps.keys()):
 			batch.append(test)
 	return batch
+
+def __get_sorted_results(tests: List[str], failed_tests: List[str]) -> Dict[str, List[str]]:
+	"""
+	### Groups the passed/failed test results by origin file
+
+	#### Params:
+	- tests (list[str]): Full list of tests
+	- failed_tests (list[str]): Names of the tests that failed 
+
+	#### Returns:
+	- (dict[str, list[str]]): Tests grouped by origin file
+	"""
+	passed_name = 'passed'
+	failed_name = 'failed'
+	results = {}
+	for origin_file, test_group in __group_tests_by_file(tests).items():
+		results[origin_file] = {failed_name: [], passed_name: []}
+		for test in test_group:
+			destination_list = failed_name if f"{origin_file}.{test}" in failed_tests else passed_name
+			results[origin_file][destination_list].append(test)
+	
+	return results
+
+def __group_tests_by_file(tests: List[str]) -> Dict[str, List[str]]:
+	"""
+	### Groups tests by origin file
+
+	#### Params:
+	- tests (list[str]): Full list of tests
+
+	#### Returns:
+	- (dict[str, list[str]]): Tests grouped by origin file
+	"""
+	grouped_tests = {}
+	for test in tests:
+		origin_file, test_name = test.split('.', 1)
+		grouped_tests.setdefault(origin_file, []).append(test_name)
+	return grouped_tests
