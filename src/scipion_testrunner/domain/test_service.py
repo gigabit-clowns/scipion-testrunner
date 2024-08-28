@@ -18,7 +18,8 @@ def test_scipion_plugin(args: Dict):
 		sys.exit(0)
 	if data_sets:
 		scipion_service.download_datasets(args['scipion'], data_sets)
-	scipion_service.run_tests(args['scipion'], tests, tests_with_deps)
+	tests, test_batches = __generate_sorted_test_batches(tests, tests_with_deps)
+	scipion_service.run_tests(args['scipion'], tests, test_batches)
 
 def __remove_skippable_tests(tests: List[str], skippable_tests: Dict, no_gpu: bool) -> List[str]:
 	"""
