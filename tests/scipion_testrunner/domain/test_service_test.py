@@ -401,27 +401,33 @@ def test_returns_expected_batch(test_with_deps, expected_batch):
 	), "Received different batch than expected"
 
 @pytest.mark.parametrize(
-	"test_with_deps,expected_batch",
+	"test_with_deps,expected_tests,expected_batches",
 	[
 		pytest.param(
 			{__TESTS[0]: [__TESTS[-1]], __TESTS[1]: [__TESTS[0]]},
-			[__TESTS[0]]
+			__TESTS[2:],
+			[[__TESTS[0]], [__TESTS[1]]]
 		),
 		pytest.param(
 			{__TESTS[0]: [__TESTS[-1]], __TESTS[1]: [__TESTS[2]]},
-			[__TESTS[0], __TESTS[1]]
+			__TESTS[2:],
+			[[__TESTS[0], __TESTS[1]]]
 		),
 		pytest.param(
 			{__TESTS[0]: [__TESTS[1]], __TESTS[1]: [__TESTS[0]]},
+			__TESTS,
 			[]
 		),
-		pytest.param({__TESTS[0]: [__TESTS[0]]}, []),
+		pytest.param({__TESTS[0]: [__TESTS[0]]}, __TESTS, []),
 	]
 )
-def test_returns_expected_sorted_batches(test_with_deps, expected_batch):
+def test_returns_expected_sorted_batches(test_with_deps, expected_tests, expected_batches):
 	assert (
-		test_service.__generate_sorted_test_batches(test_with_deps) == expected_batch
-	), "Received different batches than expected"
+		test_service.__generate_sorted_test_batches(
+			__TESTS.copy(),
+			test_with_deps
+		) == (expected_tests, expected_batches)
+	), "Received different sorted batches than expected"
 
 @pytest.fixture
 def __mock_get_all_tests():
