@@ -28,6 +28,9 @@ Scanning tests...
    scipion3 tests {__MODULE}.tests.workflows.test_workflow_xmipp.TestXmippWorkflow
 """
 __DATASETS = ["dataset_1", "dataset_2"]
+__ALL_TESTS = [f"test_{i}" for i in range(5)]
+__TESTS = __ALL_TESTS[:5]
+__TEST_BATCHES = [__ALL_TESTS[5:7], __ALL_TESTS[7:]]
 
 def test_exists_with_error_when_test_search_fails(__mock_run_shell_command, __mock_print):
   error_text = "Test fail"
@@ -110,6 +113,54 @@ def test_shows_expected_individual_download_success_message_when_downloading_ind
   __mock_print.assert_called_once_with(
     logger.green(f"Dataset {__DATASETS[0]} download OK"),
     flush=True
+  )
+
+def test_logs_inictial_run_message(__mock_print):
+  scipion_service.run_tests(__SCIPION, __TESTS, __TEST_BATCHES)
+  __mock_print.assert_called_once_with(logger.blue("Initial run of non-dependent tests."), flush=True)
+
+def test_does_not_log_inictial_run_message(__mock_print):
+  scipion_service.run_tests(__SCIPION, __TESTS, [])
+  __mock_print.assert_not_called()
+
+@pytest.mark.parametrize(
+  "batch,max_jobs,test_number_text,batch_text",
+  [
+    pytest.param(__TESTS, 2, 'tests', " in batches of 2 processes"),
+    pytest.param(__TESTS, 20, 'tests', f" in batches of {len(__TESTS)} processes"),
+    pytest.param([__TESTS[0]], 20, 'test', ""),
+    pytest.param([__TESTS[0]], 1, 'test', ""),
+    pytest.param(__TESTS, 1, 'tests', " in batches of 1 process")
+  ]
+)
+def test_logs_expected_message_when_running_test_batch(
+  batch,
+  max_jobs,
+  test_number_text,
+  batch_text,
+  __mock_print,
+  __mock_run_function_in_parallel
+):
+  scipion_service.__run_test_batch(batch, max_jobs, __SCIPION, __MODULE)
+  __mock_print.assert_called_once_with(
+    logger.blue(f"Running a total of {len(batch)} {test_number_text} for {__MODULE}{batch_text}..."),
+    flush=True
+  )
+
+def test_runs_function_in_parallel(__mock_print, __mock_run_function_in_parallel):
+  scipion_service.__run_test_batch(__TESTS, 5, __SCIPION, __MODULE)
+  __mock_run_function_in_parallel.assert_called_once_with(
+    scipion_service.__run_test,
+    __SCIPION,
+    scipion_service.__get_test_prefix(__MODULE),
+    parallelizable_params=__TESTS,
+    jobs=5
+  )
+
+@pytest.mark.parametrize("plugin", [pytest.param(''), pytest.param("test_name")])
+def test_returns_expected_test_prefix(plugin):
+  assert (
+    scipion_service.__get_test_prefix(plugin) == f'tests {plugin}.tests.'
   )
 
 @pytest.fixture
