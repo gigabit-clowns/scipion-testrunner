@@ -1,3 +1,4 @@
+import multiprocessing
 from typing import List, Optional
 
 from ..application.logger import logger
@@ -36,7 +37,8 @@ def download_datasets(scipion: str, datasets: List[str]):
 	failed_downloads = python_service.run_function_in_parallel(
 		__download_dataset,
 		scipion,
-		parallelizable_params=datasets
+		parallelizable_params=datasets,
+		jobs=multiprocessing.cpu_count() * 2
 	)
 	if failed_downloads:
 		logger.log_error("The download of at least one dataset ended with errors. Exiting.")
@@ -50,6 +52,8 @@ def run_tests(scipion: str, tests: List[str], test_batches: List[List[str]]):
 	- tests (list[str]): List of tests to run
 	- test_batches (list[list[str]]): Test batches to run in order
 	"""
+	if test_batches:
+		logger(logger.blue("Initial run of non-dependent tests."))
 
 def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]:
 	"""
@@ -136,3 +140,39 @@ def __download_dataset(dataset: str, scipion: str) -> Optional[str]:
 		return dataset
 	else:
 		logger(logger.green(f"Dataset {dataset} download OK"))
+
+def __run_test_batch(tests: List[str], max_jobs: int, scipion: str, plugin_module: str) -> List[str]:
+	"""
+	### Runs the given test batch
+
+	#### Params:
+	- tests (list[str]): Tests in the batch
+	- max_jobs (int): Maximum number of concurrent jobs
+	- scipion (str): Path to Scipion's executable
+	- plugin_module (str): Module name of the plugin to run tests for
+
+	#### Returns:
+	- (list[str]): Tests that failed
+	"""
+	batch_size = len(tests)
+	jobs = batch_size if batch_size < max_jobs else max_jobs
+	test_number_text = f"test{'s' if batch_size > 1 else ''}"
+	jobs_text = f"process{'es' if jobs > 1 else ''}"
+	batch_text = f" in batches of {jobs} {jobs_text}" if batch_size > 1 else ""
+	logger(logger.blue(f"Running a total of {batch_size} {test_number_text} for {plugin_module}{batch_text}..."))
+	return python_service.run_function_in_parallel(__run_test, scipion, __get_test_prefix(plugin_module), parallelizable_params=tests, jobs=jobs)
+
+def __run_test(test: str, scipion: str, test_prefix: str):
+	pass
+
+def __get_test_prefix(plugin_module: str):
+	"""
+	### Returns Scipion's prefix for test names
+
+	#### Params:
+	- plugin_module (str): Module name of the plugin
+
+	#### Returns:
+	- (str): Test prefix
+	"""
+	return f'tests {plugin_module}.tests.'
