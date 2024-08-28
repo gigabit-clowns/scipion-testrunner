@@ -48,18 +48,6 @@ def test_returns_expected_statuses_when_running_parallel_function(params, n_erro
     len(python_service.run_function_in_parallel(ExitState, parallelizable_params=params)) == n_errors
   ), "Parallel function call returned different number of errors than expected."
 
-@pytest.mark.parametrize(
-  "param_len,max_jobs,expected_jobs",
-  [
-    pytest.param(1, 2, 1),
-    pytest.param(2, 2, 2),
-    pytest.param(3, 2, 2)
-  ]
-)
-def test_pool_is_created_with_expected_jobs(param_len, max_jobs, expected_jobs, __mock_pool):
-  python_service.run_function_in_parallel(ExitState, parallelizable_params=['True' for _ in range(param_len)], max_jobs=max_jobs)
-  __mock_pool.assert_called_once_with(processes=expected_jobs)
-
 class ExitState:
   """
   ### Mock substitute for multiprocessing.pool.AsyncResult.

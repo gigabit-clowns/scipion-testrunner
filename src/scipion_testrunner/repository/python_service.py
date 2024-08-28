@@ -27,7 +27,7 @@ def python_command_succeeded(command: str) -> bool:
 	"""
 	return not bool(shell_service.run_shell_command(f"python -c '{command}'")[0])
 
-def run_function_in_parallel(func: Callable, *args, parallelizable_params: List[str], max_jobs: int=multiprocessing.cpu_count()) -> List:
+def run_function_in_parallel(func: Callable, *args, parallelizable_params: List[str], jobs: int=multiprocessing.cpu_count()) -> List:
 	"""
 	### Runs the given Python function in parallel
 
@@ -40,7 +40,6 @@ def run_function_in_parallel(func: Callable, *args, parallelizable_params: List[
 	#### Returns:
 	- (list): Failed commands
 	"""
-	jobs = len(parallelizable_params) if len(parallelizable_params) < max_jobs else max_jobs
 	pool = multiprocessing.Pool(processes=jobs)
 	results = [pool.apply_async(func, args=(param,*args)) for param in parallelizable_params]
 	failed_commands = []
