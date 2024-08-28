@@ -5,17 +5,14 @@ import pytest
 from scipion_testrunner.application.logger import logger
 from scipion_testrunner.domain import test_service
 
-__SCIPION_KEY = "scipion"
-__SCIPION = __SCIPION_KEY
-__PLUGIN_KEY = "plugin"
+__SCIPION = test_service.SCIPION_PARAM_NAME
 __PLUGIN = "myplugin"
-__NO_GPU_KEY = "noGpu"
-__TEST_DATA_KEY = "testData"
 __ARGS = {
-	__SCIPION_KEY: __SCIPION,
-	__PLUGIN_KEY: __PLUGIN,
-	__NO_GPU_KEY: False,
-	__TEST_DATA_KEY: "test.json"
+	test_service.SCIPION_PARAM_NAME: __SCIPION,
+	test_service.PLUGIN_PARAM_NAME: __PLUGIN,
+	test_service.JOBS_PARAM_NAME: 5,
+	test_service.NO_GPU_PARAM_NAME: False,
+	test_service.TEST_DATA_PARAM_NAME: "test.json"
 }
 __DATASETS = ["dataset_1", "dataset_2"]
 __TESTS = [f"test_{i}" for i in range(10)]
@@ -123,7 +120,13 @@ def test_calls_run_tests_when_testing_scipion_plugin(
 ):
 	__mock_remove_skippable_tests.return_value = __TESTS.copy()
 	test_service.test_scipion_plugin(__ARGS)
-	__mock_run_tests.assert_called_once_with(__SCIPION, __TESTS, [])
+	__mock_run_tests.assert_called_once_with(
+		__SCIPION,
+		__TESTS,
+		[],
+		__ARGS[test_service.JOBS_PARAM_NAME],
+		__ARGS[test_service.PLUGIN_PARAM_NAME]
+	)
 
 def test_calls_log_result_summary_when_testing_scipion_plugin(
 	__mock_get_all_tests,
