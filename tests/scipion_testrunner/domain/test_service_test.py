@@ -79,6 +79,8 @@ def test_calls_download_datasets(
 	__mock_get_all_tests,
 	__mock_read_test_data_file,
 	__mock_remove_skippable_tests,
+	__mock_remove_circular_dependencies,
+	__mock_remove_unmet_internal_dependency_tests,
 	__mock_download_datasets,
 	__mock_run_tests
 ):
@@ -102,12 +104,16 @@ def test_calls_run_tests(
 	__mock_get_all_tests,
 	__mock_read_test_data_file,
 	__mock_remove_skippable_tests,
+	__mock_remove_circular_dependencies,
+	__mock_remove_unmet_internal_dependency_tests,
 	__mock_download_datasets,
-	__mock_run_tests
+	__mock_generate_sorted_test_batches,
+	__mock_run_tests,
+	__mock_log_warning
 ):
-	__mock_remove_skippable_tests.return_value = __TESTS
+	__mock_remove_skippable_tests.return_value = __TESTS.copy()
 	test_service.test_scipion_plugin(__ARGS)
-	__mock_run_tests.assert_called_once_with(__SCIPION, __TESTS, __INTERNAL_DEPENDENCIES)
+	__mock_run_tests.assert_called_once_with(__SCIPION, __TESTS, [])
 
 @pytest.mark.parametrize(
 	"called_function,params",
@@ -419,6 +425,16 @@ def test_returns_expected_batch(test_with_deps, expected_batch):
 			[]
 		),
 		pytest.param({__TESTS[0]: [__TESTS[0]]}, __TESTS, []),
+		pytest.param(
+			{__TESTS[0]: ["non_existing"]},
+			__TESTS[1:],
+			[[__TESTS[0]]]
+		),
+		pytest.param(
+			{"non_existing": [__TESTS[0]]},
+			__TESTS,
+			[["non_existing"]]
+		)
 	]
 )
 def test_returns_expected_sorted_batches(test_with_deps, expected_tests, expected_batches):
@@ -498,4 +514,22 @@ def __mock_log_skip_dependency_test():
 @pytest.fixture
 def __mock_log_skip_test():
 	with patch("scipion_testrunner.domain.test_service.__log_skip_test") as mock_method:
+		yield mock_method
+
+@pytest.fixture
+def __mock_remove_circular_dependencies():
+	with patch("scipion_testrunner.domain.test_service.__remove_circular_dependencies") as mock_method:
+		mock_method.return_value = (__TESTS, __INTERNAL_DEPENDENCIES)
+		yield mock_method
+
+@pytest.fixture
+def __mock_remove_unmet_internal_dependency_tests():
+	with patch("scipion_testrunner.domain.test_service.__remove_unmet_internal_dependency_tests") as mock_method:
+		mock_method.return_value = (__TESTS, __INTERNAL_DEPENDENCIES)
+		yield mock_method
+
+@pytest.fixture
+def __mock_generate_sorted_test_batches():
+	with patch("scipion_testrunner.domain.test_service.__generate_sorted_test_batches") as mock_method:
+		mock_method.return_value = (__TESTS, [])
 		yield mock_method
