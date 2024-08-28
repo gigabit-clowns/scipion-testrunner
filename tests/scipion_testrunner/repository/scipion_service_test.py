@@ -43,7 +43,6 @@ def test_exists_with_error_when_test_search_fails(__mock_run_shell_command, __mo
   )
 
 def test_exits_with_error_when_plugin_is_not_installed(__mock_run_shell_command, __mock_print, __mock_exists_module):
-  __mock_run_shell_command.return_value = (0, "")
   __mock_exists_module.return_value = False
   with pytest.raises(SystemExit):
     scipion_service.get_all_tests(__SCIPION, __MODULE)
@@ -152,9 +151,55 @@ def test_runs_function_in_parallel(__mock_print, __mock_run_function_in_parallel
   __mock_run_function_in_parallel.assert_called_once_with(
     scipion_service.__run_test,
     __SCIPION,
-    scipion_service.__get_test_prefix(__MODULE),
+    __MODULE,
     parallelizable_params=__TESTS,
     jobs=5
+  )
+
+def test_logs_expected_initial_warning_when_running_test(
+  __mock_log_warning,
+  __mock_run_shell_command,
+  __mock_print
+):
+  scipion_service.__run_test(__TESTS[0], __SCIPION, __MODULE)
+  __mock_log_warning.assert_called_once_with(f"Running test {__TESTS[0]}...")
+
+@pytest.mark.parametrize(
+  "return_code,output,expected_message",
+  [
+    pytest.param(0, "", logger.green(f"Test {__TESTS[0]} OK")),
+    pytest.param(1, "AAA", logger.red(f"AAA\nTest {__TESTS[0]} failed with above message."))
+  ]
+)
+def test_logs_expected_message_when_running_test(
+  return_code,
+  output,
+  expected_message,
+  __mock_log_warning,
+  __mock_run_shell_command,
+  __mock_print
+):
+  __mock_run_shell_command.return_value = (return_code, output)
+  scipion_service.__run_test(__TESTS[0], __SCIPION, __MODULE)
+  __mock_print.assert_called_once_with(expected_message, flush=True)
+
+@pytest.mark.parametrize(
+  "return_code,expected_return",
+  [
+    pytest.param(0, None),
+    pytest.param(1, __TESTS[0])
+  ]
+)
+def test_returns_expected_output_when_running_test(
+  return_code,
+  expected_return,
+  __mock_log_warning,
+  __mock_run_shell_command,
+  __mock_print
+):
+  __mock_run_shell_command.return_value = (return_code, "")
+  assert (
+    scipion_service.__run_test(__TESTS[0], __SCIPION, __MODULE) == expected_return
   )
 
 @pytest.mark.parametrize("plugin", [pytest.param(''), pytest.param("test_name")])
@@ -166,6 +211,7 @@ def test_returns_expected_test_prefix(plugin):
 @pytest.fixture
 def __mock_run_shell_command():
   with patch("scipion_testrunner.repository.shell_service.run_shell_command") as mock_method:
+    mock_method.return_value = (0, "")
     yield mock_method
 
 @pytest.fixture
