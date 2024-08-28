@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import patch, call, Mock
 
 import pytest
 
@@ -28,7 +28,7 @@ Scanning tests...
    scipion3 tests {__MODULE}.tests.workflows.test_workflow_xmipp.TestXmippWorkflow
 """
 __DATASETS = ["dataset_1", "dataset_2"]
-__ALL_TESTS = [f"test_{i}" for i in range(5)]
+__ALL_TESTS = [f"test_{i}" for i in range(10)]
 __TESTS = __ALL_TESTS[:5]
 __TEST_BATCHES = [__ALL_TESTS[5:7], __ALL_TESTS[7:]]
 
@@ -114,13 +114,44 @@ def test_shows_expected_individual_download_success_message_when_downloading_ind
     flush=True
   )
 
-def test_logs_inictial_run_message(__mock_print):
-  scipion_service.run_tests(__SCIPION, __TESTS, __TEST_BATCHES)
-  __mock_print.assert_called_once_with(logger.blue("Initial run of non-dependent tests."), flush=True)
+def test_logs_expected_messages_when_running_tests(__mock_print, __mock_run_test_batch):
+  scipion_service.run_tests(__SCIPION, __TESTS, __TEST_BATCHES, 2, __MODULE)
+  calls = [
+    call(logger.blue("Initial run of non-dependent tests."), flush=True),
+    call(logger.blue("Batch of dependent tests 1/2."), flush=True),
+    call(logger.blue("Batch of dependent tests 2/2."), flush=True)
+  ]
+  __mock_print.assert_has_calls(calls)
 
-def test_does_not_log_inictial_run_message(__mock_print):
-  scipion_service.run_tests(__SCIPION, __TESTS, [])
+def test_does_not_log_run_messages_when_running_tests(__mock_print):
+  scipion_service.run_tests(__SCIPION, __TESTS, [], 2, __MODULE)
   __mock_print.assert_not_called()
+
+@pytest.mark.parametrize(
+  "failed_tests,expected_failed_total",
+  [
+    pytest.param([[], [], []], []),
+    pytest.param([[__TESTS[0]], [], []], [__TESTS[0]]),
+    pytest.param([[], [__TEST_BATCHES[0][0]], []], [__TEST_BATCHES[0][0]]),
+    pytest.param([[], [], [__TEST_BATCHES[1][0]]], [__TEST_BATCHES[1][0]]),
+    pytest.param([[], [__TEST_BATCHES[0][0]], [__TEST_BATCHES[1][0]]], [__TEST_BATCHES[0][0], __TEST_BATCHES[1][0]]),
+    pytest.param([[__TESTS[0]], [__TEST_BATCHES[0][0]], [__TEST_BATCHES[1][0]]], [__TESTS[0], __TEST_BATCHES[0][0], __TEST_BATCHES[1][0]]),
+    pytest.param([__TESTS.copy(), __TEST_BATCHES[0], []], __TESTS + __TEST_BATCHES[0]),
+    pytest.param([__TESTS.copy(), [], __TEST_BATCHES[1]], __TESTS + __TEST_BATCHES[1]),
+    pytest.param([[], __TEST_BATCHES[0], __TEST_BATCHES[1]], __TEST_BATCHES[0] + __TEST_BATCHES[1]),
+    pytest.param([__TESTS.copy(), __TEST_BATCHES[0], __TEST_BATCHES[1]], __ALL_TESTS),
+  ]
+)
+def test_returns_expected_failed_tests_when_running_tests(failed_tests, expected_failed_total, __mock_print):
+  mock_run_test_batch = Mock()
+  mock_run_test_batch.side_effect = failed_tests
+  with patch(
+		"scipion_testrunner.repository.scipion_service.__run_test_batch",
+		new=mock_run_test_batch
+	):
+    assert (
+      scipion_service.run_tests(__SCIPION, __TESTS.copy(), __TEST_BATCHES.copy(), 1, __MODULE) == expected_failed_total
+    ), "Received different failed tests than expected"
 
 @pytest.mark.parametrize(
   "batch,max_jobs,test_number_text,batch_text",
@@ -232,4 +263,10 @@ def __mock_run_function_in_parallel():
 @pytest.fixture
 def __mock_log_warning():
   with patch("scipion_testrunner.application.logger.Logger.log_warning") as mock_method:
+    yield mock_method
+
+@pytest.fixture
+def __mock_run_test_batch():
+  with patch("scipion_testrunner.repository.scipion_service.__run_test_batch") as mock_method:
+    mock_method.return_value = []
     yield mock_method
