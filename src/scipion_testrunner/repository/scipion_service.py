@@ -43,17 +43,31 @@ def download_datasets(scipion: str, datasets: List[str]):
 	if failed_downloads:
 		logger.log_error("The download of at least one dataset ended with errors. Exiting.")
 
-def run_tests(scipion: str, tests: List[str], test_batches: List[List[str]]):
+def run_tests(scipion: str, tests: List[str], test_batches: List[List[str]], max_jobs: int, plugin_module: str) -> List[str]:
 	"""
-	### Runs the given tests
+	### Runs the given tests and returns the name of the failed ones
 
 	#### Params:
 	- scipion (str): Path to Scipion's executable
 	- tests (list[str]): List of tests to run
 	- test_batches (list[list[str]]): Test batches to run in order
+	- max_jobs (int): Maximum number of concurrent jobs
+	- plugin_module (str): Module name of the plugin to run tests for
+
+	#### Returns:
+	- (list[str]): Names of the tests that failed 
 	"""
 	if test_batches:
 		logger(logger.blue("Initial run of non-dependent tests."))
+	failed_tests = __run_test_batch(tests, max_jobs, scipion, plugin_module)
+
+	n_batches = len(test_batches)
+	for batch_number in range(n_batches):
+		logger(logger.blue(f"Batch of dependent tests {batch_number + 1}/{n_batches}."))
+		failed_in_batch = __run_test_batch(test_batches[batch_number], max_jobs, scipion, plugin_module)
+		failed_tests.extend(failed_in_batch)
+	
+	return failed_tests
 
 def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]:
 	"""
