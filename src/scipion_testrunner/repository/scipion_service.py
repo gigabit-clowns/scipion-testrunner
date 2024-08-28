@@ -160,10 +160,27 @@ def __run_test_batch(tests: List[str], max_jobs: int, scipion: str, plugin_modul
 	jobs_text = f"process{'es' if jobs > 1 else ''}"
 	batch_text = f" in batches of {jobs} {jobs_text}" if batch_size > 1 else ""
 	logger(logger.blue(f"Running a total of {batch_size} {test_number_text} for {plugin_module}{batch_text}..."))
-	return python_service.run_function_in_parallel(__run_test, scipion, __get_test_prefix(plugin_module), parallelizable_params=tests, jobs=jobs)
+	return python_service.run_function_in_parallel(__run_test, scipion, plugin_module, parallelizable_params=tests, jobs=jobs)
 
-def __run_test(test: str, scipion: str, test_prefix: str):
-	pass
+def __run_test(test: str, scipion: str, plugin_module: str) -> Optional[str]:
+	"""
+	### Runs a given test
+
+	#### Params:
+	- test (str): Test name
+	- scipion (str): Path to Scipion's executable
+	- plugin_module (str): Module name of the plugin to run test for
+
+	#### Return:
+	- (None | str): Test name if there were any errors
+	"""
+	logger.log_warning(f"Running test {test}...")
+	ret_code, output = shell_service.run_shell_command(f"{scipion} {__get_test_prefix(plugin_module)}{test}")
+	if ret_code:
+		logger(logger.red(f"{output}\nTest {test} failed with above message."))
+		return test
+	else:
+		logger(logger.green(f"Test {test} OK"))
 
 def __get_test_prefix(plugin_module: str):
 	"""
