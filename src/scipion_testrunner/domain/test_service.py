@@ -31,6 +31,109 @@ def test_scipion_plugin(args: Dict):
 		logger.log_error("Some tests ended with errors. Exiting.")
 	logger(logger.green("\nAll test passed!"))
 
+def __find_circular_dependency(test_name: str, tests_with_deps: Dict[str, List[str]], path: List[str]=None) -> List[str]:
+	"""
+	### Returns a list of all the tests involved in a circular dependency path.
+
+	#### Params:
+	- test (str): Name of the test being checked for a circular dependency.
+	- tests_with_deps (dict[str, list[str]]): Dictionary containing tests that depend on other tests.
+	- path (list[str]): Optional. List of tests that might form a circular dependency.
+
+	#### Returns:
+	- (list[str]): List with all the tests forming a circular path.
+	"""
+	path = [] if path is None else path
+
+	if test_name in path:
+		return path[path.index(test_name):] + [test_name]
+	path.append(test_name)
+
+	for dep in tests_with_deps.get(test_name, []):
+		circular_path = __find_circular_dependency(dep, tests_with_deps, path=path.copy())
+		if circular_path:
+			return circular_path
+	return []
+
+def __generate_sorted_test_batches(tests: List[str], tests_with_deps: Dict[str, List[str]]) -> Tuple[List[str], List[List[str]]]:
+	"""
+	### Generates the list of test batches to be executed in order
+
+	#### Params:
+	- tests (list[str]): Full list of tests
+	- tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies
+
+	#### Returns:
+	- (list[str]): All remaining independent tests
+	- (list[list[str]]): List of test batches
+	"""
+	test_batches = []
+	while tests_with_deps:
+		batch = __get_test_batch(tests_with_deps)
+		if not batch:
+			break
+		test_batches.append(batch)
+		for test in batch:
+			del tests_with_deps[test]
+			if test in tests:
+				tests.remove(test)
+	return tests, test_batches
+
+def __get_test_batch(test_with_deps: Dict[str, List[str]]) -> List[str]:
+	"""
+	### Returns the next test batch to run given the dependencies between them.
+
+	#### Params:
+	- tests_with_deps (dict[str, list[str]]): Dictionary containing tests that depend on other tests.
+
+	#### Returns:
+	- (list[str]): Next test batch to run
+	"""
+	batch = []
+	for test, deps in list(test_with_deps.items()):
+		if not any(key in deps for key in test_with_deps.keys()):
+			batch.append(test)
+	return batch
+
+def __get_sorted_results(tests: List[str], failed_tests: List[str]) -> Dict[str, List[str]]:
+	"""
+	### Groups the passed/failed test results by origin file
+
+	#### Params:
+	- tests (list[str]): Full list of tests
+	- failed_tests (list[str]): Names of the tests that failed 
+
+	#### Returns:
+	- (dict[str, list[str]]): Tests grouped by origin file
+	"""
+	passed_name = 'passed'
+	failed_name = 'failed'
+	results = {}
+	for origin_file, test_group in __group_tests_by_file(tests).items():
+		results[origin_file] = {failed_name: [], passed_name: []}
+		for test in test_group:
+			destination_list = failed_name if f"{origin_file}.{test}" in failed_tests else passed_name
+			results[origin_file][destination_list].append(test)
+	
+	return results
+
+def __group_tests_by_file(tests: List[str]) -> Dict[str, List[str]]:
+	"""
+	### Groups tests by origin file
+
+	#### Params:
+	- tests (list[str]): Full list of tests
+
+	#### Returns:
+	- (dict[str, list[str]]): Tests grouped by origin file
+	"""
+	grouped_tests = {}
+	for test in tests:
+		origin_file, test_name = test.split('.', 1)
+		grouped_tests.setdefault(origin_file, []).append(test_name)
+	return grouped_tests
+
+############################ REMOVAL FUNCTIONS ############################
 def __remove_skippable_tests(tests: List[str], skippable_tests: Dict, no_gpu: bool) -> List[str]:
 	"""
 	### Removes all the tests that apply from the full test list
@@ -137,39 +240,6 @@ def __remove_unmet_internal_dependency_tests(tests: List[str], tests_with_deps: 
 		return __remove_unmet_internal_dependency_tests(tests, tests_with_deps)
 	return tests, tests_with_deps
 
-def __log_skip_gpu_test(test_name: str):
-	"""
-	### Logs the removal of a GPU-based test
-
-	#### Params:
-	- test_name (str): Name of the test to skip
-	"""
-	__log_skip_test(test_name, "Needs GPU")
-
-def __log_skip_dependency_test(test_name: str, dependency: str, is_plugin: bool=True):
-	"""
-	### Logs the removal of a dependency-based test
-
-	#### Params:
-	- test_name (str): Name of the test to skip
-	- dependency (str): Name of the plugin or module the test deppends on
-	- is_plugin (bool): If True, the package is a plugin. Otherwise, is a regular python package.
-	"""
-	package_type = 'plugin' if is_plugin else 'package'
-	dependency_name_message = f" with {package_type} {dependency}" if dependency else ""
-	__log_skip_test(test_name, f"Unmet dependency{dependency_name_message}")
-
-def __log_skip_test(test_name: str, custom_text: str):
-	"""
-	### Logs the removal of a test
-
-	#### Params:
-	- test_name (str): Name of the test to skip
-	- custom_text (str): Custom reason why the test is being skipped
-	"""
-	reason_text = f"Reason: {custom_text}" if custom_text else "No reason provided"
-	logger.log_warning(f"Skipping test {test_name}. {reason_text}.")
-
 def __remove_circular_dependencies(tests: List[str], tests_with_deps: Dict[str, List[str]]) -> Tuple[List[str], Dict[str, List[str]]]:
 	"""
 	### Removes all the tests that are within a circular dependency
@@ -215,107 +285,39 @@ def __remove_circular_dependency(tests: List[str], tests_with_deps: Dict[str, Li
 		circular_path = circular_path[1:] + [circular_path[1]]
 	return tests, tests_with_deps
 
-def __find_circular_dependency(test_name: str, tests_with_deps: Dict[str, List[str]], path: List[str]=None) -> List[str]:
+############################ LOG FUNCTIONS ############################
+def __log_skip_gpu_test(test_name: str):
 	"""
-	### Returns a list of all the tests involved in a circular dependency path.
+	### Logs the removal of a GPU-based test
 
 	#### Params:
-	- test (str): Name of the test being checked for a circular dependency.
-	- tests_with_deps (dict[str, list[str]]): Dictionary containing tests that depend on other tests.
-	- path (list[str]): Optional. List of tests that might form a circular dependency.
-
-	#### Returns:
-	- (list[str]): List with all the tests forming a circular path.
+	- test_name (str): Name of the test to skip
 	"""
-	path = [] if path is None else path
+	__log_skip_test(test_name, "Needs GPU")
 
-	if test_name in path:
-		return path[path.index(test_name):] + [test_name]
-	path.append(test_name)
-
-	for dep in tests_with_deps.get(test_name, []):
-		circular_path = __find_circular_dependency(dep, tests_with_deps, path=path.copy())
-		if circular_path:
-			return circular_path
-	return []
-
-def __generate_sorted_test_batches(tests: List[str], tests_with_deps: Dict[str, List[str]]) -> Tuple[List[str], List[List[str]]]:
+def __log_skip_dependency_test(test_name: str, dependency: str, is_plugin: bool=True):
 	"""
-	### Generates the list of test batches to be executed in order
+	### Logs the removal of a dependency-based test
 
 	#### Params:
-	- tests (list[str]): Full list of tests
-	- tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies
-
-	#### Returns:
-	- (list[str]): All remaining independent tests
-	- (list[list[str]]): List of test batches
+	- test_name (str): Name of the test to skip
+	- dependency (str): Name of the plugin or module the test deppends on
+	- is_plugin (bool): If True, the package is a plugin. Otherwise, is a regular python package.
 	"""
-	test_batches = []
-	while tests_with_deps:
-		batch = __get_test_batch(tests_with_deps)
-		if not batch:
-			break
-		test_batches.append(batch)
-		for test in batch:
-			del tests_with_deps[test]
-			if test in tests:
-				tests.remove(test)
-	return tests, test_batches
+	package_type = 'plugin' if is_plugin else 'package'
+	dependency_name_message = f" with {package_type} {dependency}" if dependency else ""
+	__log_skip_test(test_name, f"Unmet dependency{dependency_name_message}")
 
-def __get_test_batch(test_with_deps: Dict[str, List[str]]) -> List[str]:
+def __log_skip_test(test_name: str, custom_text: str):
 	"""
-	### Returns the next test batch to run given the dependencies between them.
+	### Logs the removal of a test
 
 	#### Params:
-	- tests_with_deps (dict[str, list[str]]): Dictionary containing tests that depend on other tests.
-
-	#### Returns:
-	- (list[str]): Next test batch to run
+	- test_name (str): Name of the test to skip
+	- custom_text (str): Custom reason why the test is being skipped
 	"""
-	batch = []
-	for test, deps in list(test_with_deps.items()):
-		if not any(key in deps for key in test_with_deps.keys()):
-			batch.append(test)
-	return batch
-
-def __get_sorted_results(tests: List[str], failed_tests: List[str]) -> Dict[str, List[str]]:
-	"""
-	### Groups the passed/failed test results by origin file
-
-	#### Params:
-	- tests (list[str]): Full list of tests
-	- failed_tests (list[str]): Names of the tests that failed 
-
-	#### Returns:
-	- (dict[str, list[str]]): Tests grouped by origin file
-	"""
-	passed_name = 'passed'
-	failed_name = 'failed'
-	results = {}
-	for origin_file, test_group in __group_tests_by_file(tests).items():
-		results[origin_file] = {failed_name: [], passed_name: []}
-		for test in test_group:
-			destination_list = failed_name if f"{origin_file}.{test}" in failed_tests else passed_name
-			results[origin_file][destination_list].append(test)
-	
-	return results
-
-def __group_tests_by_file(tests: List[str]) -> Dict[str, List[str]]:
-	"""
-	### Groups tests by origin file
-
-	#### Params:
-	- tests (list[str]): Full list of tests
-
-	#### Returns:
-	- (dict[str, list[str]]): Tests grouped by origin file
-	"""
-	grouped_tests = {}
-	for test in tests:
-		origin_file, test_name = test.split('.', 1)
-		grouped_tests.setdefault(origin_file, []).append(test_name)
-	return grouped_tests
+	reason_text = f"Reason: {custom_text}" if custom_text else "No reason provided"
+	logger.log_warning(f"Skipping test {test_name}. {reason_text}.")
 
 def __log_result_summary(results: Dict[str, List[str]]):
 	"""
