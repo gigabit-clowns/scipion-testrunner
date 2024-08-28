@@ -16,7 +16,15 @@
   ],
   "skippable": {
     "gpu": [],
-    "dependencies": [],
+    "dependencies": [
+      {
+        "name": "scipion-em-xmipp",
+        "module": "xmipp3",
+        "tests": [
+            "protocols.test_projection_edit.TestProjectionEdit"
+        ]
+      }
+    ],
     "others": []
   },
   "test-dependencies": {}
