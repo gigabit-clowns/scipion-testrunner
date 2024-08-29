@@ -217,7 +217,7 @@ def __remove_other_tests(tests: List[str], other_tests: List[Dict]) -> List[str]
 	- (list[str]): List of tests where other tests have been removed
 	"""
 	for other_test in other_tests:
-		test_name = other_test.get("name")
+		test_name = other_test.get("test")
 		reason = other_test.get("reason")
 		if test_name and test_name in tests:
 			__log_skip_test(test_name, reason)
