@@ -8,6 +8,7 @@
     "mda",
     "ribo_movies",
     "relion_tutorial",
+    "hemoglobin_mda",
     "emx",
     "initial_volume",
     "particles",
@@ -34,7 +35,8 @@
             "workflows.test_workflow_initialvolume.TestRibosome",
             "workflows.test_workflow_mixed.TestMixedBPV",
             "workflows.test_workflow_mixed.TestMixedBPV2",
-            "workflows.test_workflow_initialvolume.TestSignificant"
+            "workflows.test_workflow_initialvolume.TestSignificant",
+            "workflows.test_workflow_mixed_large.TestMixedFrealignClassify"
         ]
       },
       {
@@ -54,6 +56,32 @@
         "name": "scipion-em-relion",
         "module": "relion",
         "tests": ["protocols.test_protocol_volume_homogenizer.TestVolumeHomogenizer"]
+      },
+      {
+        "name": "scipion-em-ccp4",
+        "module": "ccp4",
+        "tests": [
+          "workflows.test_workflow_modeling.TestRefmacRefinement",
+          "workflows.test_workflow_modeling.TestCootRefinement",
+          "workflows.test_workflow_modeling.TestEMRingerValidation",
+          "workflows.test_workflow_modeling.TestMolprobityValidation"
+        ]
+      },
+      {
+        "name": "scipion-em-chimera",
+        "module": "chimera",
+        "tests": [
+          "workflows.test_workflow_modeling.TestEMRingerValidation",
+          "workflows.test_workflow_modeling.TestMolprobityValidation",
+          "workflows.test_workflow_modeling.TestChimeraFit"
+        ]
+      },
+      {
+        "name": "scipion-em-phenix",
+        "module": "phenix",
+        "tests": [
+          "workflows.test_workflow_modeling.TestEMRingerValidation"
+        ]
       }
     ],
     "others": [
