@@ -3,6 +3,7 @@ from unittest.mock import patch, Mock, call
 import pytest
 
 from scipion_testrunner.application.logger import logger
+from scipion_testrunner.repository.file_service import test_data_keys
 from scipion_testrunner.domain import test_service
 
 __SCIPION = test_service.SCIPION_PARAM_NAME
@@ -16,21 +17,22 @@ __ARGS = {
 }
 __DATASETS = ["dataset_1", "dataset_2"]
 __TESTS = [f"test_{i}" for i in range(10)]
-__GPU_KEY = "gpu"
-__DEPENDENCIES_KEY = "dependencies"
-__OTHERS_KEY = "others"
 __SKIPPABLE_GPU = __TESTS[:1]
 __SKIPPABLE_DEPENDENCIES = [
-	{"name": "testplugin", "module": "pluginmodule", "tests": ["test_5"]}
+	{
+		test_data_keys.SKIPPABLE_DEPENDENCIES_NAME_KEY: "testplugin",
+		test_data_keys.SKIPPABLE_DEPENDENCIES_MODULE_KEY: "pluginmodule",
+		test_data_keys.SKIPPABLE_DEPENDENCIES_TESTS_KEY: ["test_5"]
+	}
 ]
 __SKIPPABLE_OTHER = [
-	{'test': "test_3", "reason": "Test reason"},
-	{'test': "test_4"}
+	{test_data_keys.SKIPPABLE_OTHERS_TEST_KEY: "test_3", test_data_keys.SKIPPABLE_OTHERS_REASON_KEY: "Test reason"},
+	{test_data_keys.SKIPPABLE_OTHERS_TEST_KEY: "test_4"}
 ]
 __SKIPPABLE = {
-	__GPU_KEY: __SKIPPABLE_GPU,
-	__DEPENDENCIES_KEY: __SKIPPABLE_DEPENDENCIES,
-	__OTHERS_KEY: __SKIPPABLE_OTHER
+	test_data_keys.SKIPPABLE_GPU_KEY: __SKIPPABLE_GPU,
+	test_data_keys.SKIPPABLE_DEPENDENCIES_KEY: __SKIPPABLE_DEPENDENCIES,
+	test_data_keys.SKIPPABLE_OTHERS_KEY: __SKIPPABLE_OTHER
 }
 __INTERNAL_DEPENDENCIES = {
 	"test_1": ["test_6"],
@@ -251,7 +253,12 @@ def test_removes_expected_gpu_tests(to_remove, no_gpu, __mock_log_skip_gpu_test)
 def test_logs_skipping_dependency_test_with_expected_args(name, is_plugin, __mock_exists_python_module, __mock_log_skip_dependency_test):
 	test_to_remove = "test_1"
 	test_service.__remove_dependency_tests(__TESTS.copy(), [
-		{'name': name, 'module': 'test_module', 'isPlugin': is_plugin, 'tests': [test_to_remove]}
+		{
+			test_data_keys.SKIPPABLE_DEPENDENCIES_NAME_KEY: name,
+			test_data_keys.SKIPPABLE_DEPENDENCIES_MODULE_KEY: 'test_module',
+			test_data_keys.SKIPPABLE_DEPENDENCIES_IS_PLUGIN_KEY: is_plugin,
+			test_data_keys.SKIPPABLE_DEPENDENCIES_TESTS_KEY: [test_to_remove]
+		}
 	])
 	__mock_log_skip_dependency_test.assert_called_once_with(test_to_remove, name, is_plugin=is_plugin)
 
@@ -274,10 +281,10 @@ def test_removes_expected_dependency_tests(
 	mock_exists_python_module = Mock()
 	mock_exists_python_module.side_effect = exist
 	dependency_tests = [{
-		'name': 'test_name',
-		'module': 'test_module',
-		'isPlugin': True,
-		'tests': [test]
+		test_data_keys.SKIPPABLE_DEPENDENCIES_NAME_KEY: 'test_name',
+		test_data_keys.SKIPPABLE_DEPENDENCIES_MODULE_KEY: 'test_module',
+		test_data_keys.SKIPPABLE_DEPENDENCIES_IS_PLUGIN_KEY: True,
+		test_data_keys.SKIPPABLE_DEPENDENCIES_TESTS_KEY: [test]
 	} for test in to_remove]
 	with patch(
 		"scipion_testrunner.repository.python_service.exists_python_module",
@@ -291,7 +298,7 @@ def test_logs_skipping_other_test(__mock_log_skip_test):
 	reason = "test_reason"
 	test_service.__remove_other_tests(
 		__TESTS.copy(), 
-		[{'test': __TESTS[0], "reason": reason}]
+		[{test_data_keys.SKIPPABLE_OTHERS_TEST_KEY: __TESTS[0], test_data_keys.SKIPPABLE_OTHERS_REASON_KEY: reason}]
 	)
 	__mock_log_skip_test.assert_called_once_with(__TESTS[0], reason)
 
@@ -305,7 +312,12 @@ def test_logs_skipping_other_test(__mock_log_skip_test):
 )
 def test_removes_expected_other_tests(to_remove, __mock_log_skip_test):
 	remaining = list(set(__TESTS.copy()) - set(to_remove))
-	other_tests = [{"name": test_name, "reason": "test_reason"} for test_name in to_remove]
+	other_tests = [
+		{
+			test_data_keys.SKIPPABLE_OTHERS_TEST_KEY: test_name,
+			test_data_keys.SKIPPABLE_OTHERS_REASON_KEY: "test_reason"
+		} for test_name in to_remove
+	]
 	assert (
 		test_service.__remove_other_tests(__TESTS.copy(), other_tests).sort() == remaining.sort()
 	), "Different remaining tests than expected."
@@ -582,7 +594,7 @@ def __mock_log_warning():
 
 @pytest.fixture
 def __mock_read_test_data_file():
-	with patch("scipion_testrunner.repository.file_service.read_test_data_file") as mock_method:
+	with patch("scipion_testrunner.repository.file_service.file_service.read_test_data_file") as mock_method:
 		mock_method.return_value = (__DATASETS, __SKIPPABLE, __INTERNAL_DEPENDENCIES)
 		yield mock_method
 

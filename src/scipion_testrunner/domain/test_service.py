@@ -1,8 +1,11 @@
 import sys
 from typing import Dict, List, Tuple
 
+from ..repository.file_service import file_service
+
 from ..application.logger import logger
-from ..repository import scipion_service, file_service, python_service
+from ..repository import scipion_service, python_service
+from ..repository.file_service import test_data_keys
 
 SCIPION_PARAM_NAME = "scipion"
 PLUGIN_PARAM_NAME = "plugin"
@@ -158,9 +161,9 @@ def __remove_skippable_tests(tests: List[str], skippable_tests: Dict, no_gpu: bo
 	#### Returns:
 	- (list[str]): List of tests where skippable ones are removed if applicable
 	"""
-	tests = __remove_gpu_tests(tests, skippable_tests.get('gpu', []), no_gpu)
-	tests = __remove_dependency_tests(tests, skippable_tests.get('dependencies', []))
-	return __remove_other_tests(tests, skippable_tests.get('others', []))
+	tests = __remove_gpu_tests(tests, skippable_tests.get(test_data_keys.SKIPPABLE_GPU_KEY, []), no_gpu)
+	tests = __remove_dependency_tests(tests, skippable_tests.get(test_data_keys.SKIPPABLE_DEPENDENCIES_KEY, []))
+	return __remove_other_tests(tests, skippable_tests.get(test_data_keys.SKIPPABLE_OTHERS_KEY, []))
 
 def __remove_gpu_tests(tests: List[str], gpu_tests: List[str], no_gpu: bool) -> List[str]:
 	"""
@@ -194,12 +197,12 @@ def __remove_dependency_tests(tests: List[str], dependency_tests: List[Dict]) ->
 	- (list[str]): List of tests where dependency-based ones are removed if applicable
 	"""
 	for dependency in dependency_tests:
-		plugin_name = dependency.get('name')
-		module_name = dependency.get('module')
-		is_plugin = dependency.get('isPlugin', True)
+		plugin_name = dependency.get(test_data_keys.SKIPPABLE_DEPENDENCIES_NAME_KEY)
+		module_name = dependency.get(test_data_keys.SKIPPABLE_DEPENDENCIES_MODULE_KEY)
+		is_plugin = dependency.get(test_data_keys.SKIPPABLE_DEPENDENCIES_IS_PLUGIN_KEY, True)
 		if module_name and python_service.exists_python_module(module_name):
 			continue
-		for dependency_test in dependency.get("tests", []):
+		for dependency_test in dependency.get(test_data_keys.SKIPPABLE_DEPENDENCIES_TESTS_KEY, []):
 			if dependency_test in tests:
 				__log_skip_dependency_test(dependency_test, plugin_name, is_plugin=is_plugin)
 				tests.remove(dependency_test)
@@ -217,8 +220,8 @@ def __remove_other_tests(tests: List[str], other_tests: List[Dict]) -> List[str]
 	- (list[str]): List of tests where other tests have been removed
 	"""
 	for other_test in other_tests:
-		test_name = other_test.get("test")
-		reason = other_test.get("reason")
+		test_name = other_test.get(test_data_keys.SKIPPABLE_OTHERS_TEST_KEY)
+		reason = other_test.get(test_data_keys.SKIPPABLE_OTHERS_REASON_KEY)
 		if test_name and test_name in tests:
 			__log_skip_test(test_name, reason)
 			tests.remove(test_name)

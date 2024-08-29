@@ -4,16 +4,13 @@ from unittest.mock import patch
 import pytest
 
 from scipion_testrunner.application.logger import logger
-from scipion_testrunner.repository import file_service
+from scipion_testrunner.repository.file_service import file_service, test_data_keys
 
-__DATASETS_KEY = "datasets"
-__SKIPPABLE_KEY = "skippable"
-__TEST_DEPENDENCIES_KEY = "test-dependencies"
 __DUMMY_FILE_PATH = "path"
 __FILE_DATA = {
-  __DATASETS_KEY: ['1', '2'],
-  __SKIPPABLE_KEY: {'key': 'value'},
-  __TEST_DEPENDENCIES_KEY: {'key': 'value'}
+  test_data_keys.DATASETS_KEY: ['1', '2'],
+  test_data_keys.SKIPPABLE_TESTS_KEY: {'key': 'value'},
+  test_data_keys.TEST_INTERNAL_DEPENDENCIES_KEY: {'key': 'value'}
 }
 __EXCEPTION_TEXT = "Test"
 __JSON_EXCEPTION = json.JSONDecodeError(__EXCEPTION_TEXT, __DUMMY_FILE_PATH, 1)
@@ -26,9 +23,9 @@ def test_returns_empty_fields(__mock_log):
 def test_returns_expected_fields(__mock_open, __mock_json_load):
   assert (
     file_service.read_test_data_file(__DUMMY_FILE_PATH) == (
-      __FILE_DATA[__DATASETS_KEY],
-      __FILE_DATA[__SKIPPABLE_KEY],
-      __FILE_DATA[__TEST_DEPENDENCIES_KEY]
+      __FILE_DATA[test_data_keys.DATASETS_KEY],
+      __FILE_DATA[test_data_keys.SKIPPABLE_TESTS_KEY],
+      __FILE_DATA[test_data_keys.TEST_INTERNAL_DEPENDENCIES_KEY]
     )
   ), "Test data file did not return the expected data."
 
