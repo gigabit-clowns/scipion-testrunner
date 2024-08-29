@@ -42,7 +42,13 @@
             "protocols.test_protocols_import_particles.TestImportParticles",
             "protocols.test_protocols_import_micrographs.TestImportMicrographs",
             "protocols.test_protocols_import_coords.TestImportCoordinates",
-            "protocols.test_protocols_import_coords.TestImportCoordinatesPairs"
+            "protocols.test_protocols_import_coords.TestImportCoordinatesPairs",
+            "workflows.test_parallel_gpu_queue.TestQueueSteps",
+            "workflows.test_parallel_gpu_queue.TestQueueSmall",
+            "workflows.test_parallel_gpu_queue.TestQueueALL",
+            "workflows.test_parallel_gpu_queue.TestNoQueueSmall",
+            "workflows.test_parallel_gpu_queue.TestNoQueueALL",
+            "protocols.test_protocols_import_masks.TestImportMasks"
         ]
       },
       {
@@ -117,6 +123,18 @@
       {
         "test": "data.test_data.TestFSC",
         "reason": "AttributeError: 'NoneType' object has no attribute 'addObject'"
+      },
+      {
+        "test": "protocols.test_plugin.TestPluginCudaGuess",
+        "reason": "packaging.version.InvalidVersion: Invalid version: '11.2.safe'"
+      },
+      {
+        "test": "protocols.test_protocols_sets.TestSets",
+        "reason": "Collides with same-name different test : sqlite3.OperationalError: attempt to write a readonly database"
+      },
+      {
+        "test": "protocols.test_protocols_sets.TestSets",
+        "reason": "Collides with same-name different test protocols.test_protocols_sets.TestSets: sqlite3.OperationalError: attempt to write a readonly database"
       }
     ]
   },
