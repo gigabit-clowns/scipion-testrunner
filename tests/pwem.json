@@ -36,7 +36,13 @@
             "workflows.test_workflow_mixed.TestMixedBPV",
             "workflows.test_workflow_mixed.TestMixedBPV2",
             "workflows.test_workflow_initialvolume.TestSignificant",
-            "workflows.test_workflow_mixed_large.TestMixedFrealignClassify"
+            "workflows.test_workflow_mixed_large.TestMixedFrealignClassify",
+            "workflows.test_workflow_mixed_large.TestMixedRelionTutorial",
+            "protocols.test_protocols_import_volumes.TestImportVolumes",
+            "protocols.test_protocols_import_particles.TestImportParticles",
+            "protocols.test_protocols_import_micrographs.TestImportMicrographs",
+            "protocols.test_protocols_import_coords.TestImportCoordinates",
+            "protocols.test_protocols_import_coords.TestImportCoordinatesPairs"
         ]
       },
       {
@@ -55,7 +61,10 @@
       {
         "name": "scipion-em-relion",
         "module": "relion",
-        "tests": ["protocols.test_protocol_volume_homogenizer.TestVolumeHomogenizer"]
+        "tests": [
+          "protocols.test_protocol_volume_homogenizer.TestVolumeHomogenizer",
+          "protocols.test_protocols_import_particles.TestImportParticles"
+        ]
       },
       {
         "name": "scipion-em-ccp4",
@@ -81,6 +90,14 @@
         "module": "phenix",
         "tests": [
           "workflows.test_workflow_modeling.TestEMRingerValidation"
+        ]
+      },
+      {
+        "name": "scipion-em-emxlib",
+        "module": "emxlib",
+        "tests": [
+          "protocols.test_protocols_import_particles.TestImportParticles",
+          "protocols.test_protocols_import_micrographs.TestImportMicrographs"
         ]
       }
     ],
