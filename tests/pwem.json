@@ -27,8 +27,13 @@
             "workflows.test_workflow_xmipp_ctf_consensus.TestCtfConsensus",
             "workflows.test_workflow_xmipp_assignment_tiltpairs.TestXmippAssignmentTiltPairsWorkflow",
             "workflows.test_workflow_xmipp.TestXmippWorkflow",
-            "TestExport2DataBases.test_volume1_AtomStructCIF",
-            "TestExport2DataBases.test_volume1_AtomStructPDB"
+            "protocols.test_protocol_export2DB.TestExport2DataBases",
+            "workflows.test_workflow_initialvolume.TestBPV",
+            "workflows.test_workflow_initialvolume.TestGroel",
+            "workflows.test_workflow_initialvolume.TestRibosome",
+            "workflows.test_workflow_mixed.TestMixedBPV",
+            "workflows.test_workflow_mixed.TestMixedBPV2",
+            "workflows.test_workflow_initialvolume.TestSignificant"
         ]
       },
       {
@@ -57,31 +62,19 @@
     ],
     "others": [
       {
-        "test": "TestSymmetry.test_22_SymmetryTetrahedralZ3SymmetryMatrices",
+        "test": "data.test_symmetry.TestSymmetry",
         "reason": "AttributeError: module 'numpy' has no attribute 'float'.\n`np.float` was a deprecated alias for the builtin `float`. To avoid this error in existing code, use `float` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.float64` here."
       },
       {
-        "test": "TestSymmetry.test_23_SymmetryTetrahedralZ3SymmetryMatrices",
-        "reason": "AttributeError: module 'numpy' has no attribute 'float'.\n`np.float` was a deprecated alias for the builtin `float`. To avoid this error in existing code, use `float` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.float64` here."
-      },
-      {
-        "test": "TestSymmetry.test_25_SymmetryTetahedralZ3RUnitCell",
-        "reason": "AttributeError: module 'numpy' has no attribute 'float'.\n`np.float` was a deprecated alias for the builtin `float`. To avoid this error in existing code, use `float` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.float64` here."
-      },
-      {
-        "test": "TestSymmetry.test_26_SymmetryTetahedralZ3UnitCell",
-        "reason": "AttributeError: module 'numpy' has no attribute 'float'.\n`np.float` was a deprecated alias for the builtin `float`. To avoid this error in existing code, use `float` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.float64` here."
-      },
-      {
-        "test": "TestMetaData.test_dropKeepColumns",
+        "test": "data.test_metadata.TestMetaData",
         "reason": "AttributeError: 'NoneType' object has no attribute 'addObject'"
       },
       {
-        "test": "TestMetaData.test_iterRowMetadata",
-        "reason": "AttributeError: 'NoneType' object has no attribute 'addObject'"
+        "test": "data.test_data.TestSetOfParticles",
+        "reason": "TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'"
       },
       {
-        "test": "TestMetaData.test_removeDuplicates",
+        "test": "data.test_data.TestFSC",
         "reason": "AttributeError: 'NoneType' object has no attribute 'addObject'"
       }
     ]
