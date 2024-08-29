@@ -291,7 +291,7 @@ def test_logs_skipping_other_test(__mock_log_skip_test):
 	reason = "test_reason"
 	test_service.__remove_other_tests(
 		__TESTS.copy(), 
-		[{'name': __TESTS[0], "reason": reason}]
+		[{'test': __TESTS[0], "reason": reason}]
 	)
 	__mock_log_skip_test.assert_called_once_with(__TESTS[0], reason)
 
