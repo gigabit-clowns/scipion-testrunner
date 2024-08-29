@@ -48,7 +48,8 @@
             "workflows.test_parallel_gpu_queue.TestQueueALL",
             "workflows.test_parallel_gpu_queue.TestNoQueueSmall",
             "workflows.test_parallel_gpu_queue.TestNoQueueALL",
-            "protocols.test_protocols_import_masks.TestImportMasks"
+            "protocols.test_protocols_import_masks.TestImportMasks",
+            "test_protocols_import_movies.TestImportMovies"
         ]
       },
       {
