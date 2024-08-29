@@ -1,7 +1,8 @@
 import json
 from typing import Tuple, List, Dict
 
-from ..application.logger import logger
+from ...application.logger import logger
+from ..file_service import test_data_keys
 
 def read_test_data_file(file_path: str) -> Tuple[List[str], Dict, Dict]:
 	"""
@@ -22,7 +23,11 @@ def read_test_data_file(file_path: str) -> Tuple[List[str], Dict, Dict]:
 	try:
 		with open(file_path, 'r') as file:
 			data_file = json.load(file)
-			return data_file.get("datasets", []), data_file.get("skippable", {}), data_file.get("test-dependencies", {})
+			return (
+				data_file.get(test_data_keys.DATASETS_KEY, []),
+				data_file.get(test_data_keys.SKIPPABLE_TESTS_KEY, {}),
+				data_file.get(test_data_keys.TEST_INTERNAL_DEPENDENCIES_KEY, {})
+			)
 	except FileNotFoundError:
 		logger.log_error(f"ERROR: File '{file_path}' does not exist.")
 	except IsADirectoryError:
