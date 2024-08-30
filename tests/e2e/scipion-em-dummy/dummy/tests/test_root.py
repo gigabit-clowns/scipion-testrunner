@@ -13,7 +13,7 @@ class TestRoot(BaseTest):
     return getattr(prot_dummy, prot_dummy._OUTNAME)
 
   def test_true(self):
-    self.assertIsTrue(self.__run_dummy(True))
+    self.assertTrue(self.__run_dummy(True))
 
   def test_false(self):
-    self.assertIsTrue(self.__run_dummy(False))
+    self.assertFalse(self.__run_dummy(False))
