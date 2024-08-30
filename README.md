@@ -5,7 +5,7 @@ This module, even if it can be used locally as a user-friendly way of running al
 This Python module needs to be installed in an enviroment with an installation of Scipion3 in order to work.
 
 ## Installation
-To install this package, activate the enviroment that contains Scipion, and run `pip install scipion-testrunner`.
+To install this package, activate the enviroment that contains [Scipion](https://scipion.i2pc.es/), and run `pip install scipion-testrunner`.
 
 ## Usage
 To view the usage guide, run `scipion-testrunner -h`.
