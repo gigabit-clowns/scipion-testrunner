@@ -23,17 +23,17 @@ jobs:
     - name: Get package version
       id: version
       run: |
-        export VERSION=$(pip show ${{ github.event.repository.name }} | grep Version | awk '{print $2}')
+        export VERSION=$(pip show ${{ variables.MODULE_NAME }} | grep Version | awk '{print $2}')
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
         echo "Version number: $VERSION"
     
     - name: Build and publish
       env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_USERNAME: ${{ variables.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
         python -m build
-        twine upload --repository ${{ github.event.repository.name }} dist/*
+        twine upload --repository ${{ variables.MODULE_NAME }} dist/*
     
     - name: Generate tag
       id: tag_version
