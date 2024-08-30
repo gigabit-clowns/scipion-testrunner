@@ -47,3 +47,6 @@ jobs:
         run: |
           chmod +x $SCRIPT_PATH
           poetry run $SCRIPT_PATH
+      
+      - name: Check with Ruff
+        run: ruff check .
