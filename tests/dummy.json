@@ -1,0 +1,12 @@
+{
+  "datasets": [
+    "mda",
+    "emx"
+  ],
+  "skippable": {
+    "gpu": [],
+    "dependencies": [],
+    "others": []
+  },
+  "test-dependencies": {}
+}
