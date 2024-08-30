@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pytest
 
 from scipion_testrunner.application.logger import logger
-from scipion_testrunner.repository.file_service import file_service, test_data_keys
+from scipion_testrunner.configuration import test_config, test_data_keys
 
 __DUMMY_FILE_PATH = "path"
 __FILE_DATA = {
@@ -17,12 +17,12 @@ __JSON_EXCEPTION = json.JSONDecodeError(__EXCEPTION_TEXT, __DUMMY_FILE_PATH, 1)
 
 def test_returns_empty_fields(__mock_log):
   assert (
-    file_service.read_test_data_file("") == ([], {}, {})
+    test_config.get_test_config("") == ([], {}, {})
   ), "Empty file path should have returned empty fields."
 
 def test_returns_expected_fields(__mock_open, __mock_json_load):
   assert (
-    file_service.read_test_data_file(__DUMMY_FILE_PATH) == (
+    test_config.get_test_config(__DUMMY_FILE_PATH) == (
       __FILE_DATA[test_data_keys.DATASETS_KEY],
       __FILE_DATA[test_data_keys.SKIPPABLE_TESTS_KEY],
       __FILE_DATA[test_data_keys.TEST_INTERNAL_DEPENDENCIES_KEY]
@@ -31,29 +31,29 @@ def test_returns_expected_fields(__mock_open, __mock_json_load):
 
 def test_exits_on_file_not_found_error(__mock_open_raise_file_not_found_error, __mock_log):
   with pytest.raises(SystemExit):
-    file_service.read_test_data_file(__DUMMY_FILE_PATH)
+    test_config.get_test_config(__DUMMY_FILE_PATH)
   __mock_log.assert_called_once_with(logger.red(f"ERROR: File '{__DUMMY_FILE_PATH}' does not exist."))
 
 def test_exits_on_is_a_directory_error(__mock_open_raise_is_directory_error, __mock_log):
   with pytest.raises(SystemExit):
-    file_service.read_test_data_file(__DUMMY_FILE_PATH)
+    test_config.get_test_config(__DUMMY_FILE_PATH)
   __mock_log.assert_called_once_with(logger.red(f"ERROR: Path '{__DUMMY_FILE_PATH}' provided is a directory."))
 
 def test_exits_on_permission_error(__mock_open_raise_permission_error, __mock_log):
   with pytest.raises(SystemExit):
-    file_service.read_test_data_file(__DUMMY_FILE_PATH)
+    test_config.get_test_config(__DUMMY_FILE_PATH)
   __mock_log.assert_called_once_with(logger.red(f"ERROR: Permission denied to open file '{__DUMMY_FILE_PATH}'."))
 
 def test_exits_on_json_decode_error(__mock_open, __mock_json_load_raise_json_decode_error, __mock_log):
   with pytest.raises(SystemExit):
-    file_service.read_test_data_file(__DUMMY_FILE_PATH)
+    test_config.get_test_config(__DUMMY_FILE_PATH)
   __mock_log.assert_called_once_with(
     logger.red(f"ERROR: Invalid JSON format in file '{__DUMMY_FILE_PATH}':\n{__JSON_EXCEPTION}")
   )
 
 def test_exits_on_exception(__mock_open_raise_exception, __mock_log):
   with pytest.raises(SystemExit):
-    file_service.read_test_data_file(__DUMMY_FILE_PATH)
+    test_config.get_test_config(__DUMMY_FILE_PATH)
   __mock_log.assert_called_once_with(logger.red(f"An unexpected error occurred:\n{__EXCEPTION_TEXT}"))
 
 @pytest.fixture

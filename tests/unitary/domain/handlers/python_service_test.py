@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from scipion_testrunner.repository import python_service
+from scipion_testrunner.domain.handlers import python_handler
 
 __MODULE_NAME = "test"
 
@@ -17,7 +17,7 @@ __MODULE_NAME = "test"
 def test_returns_expected_value_when_checking_if_module_exists(exists, message_fragment, __mock_python_command_succeeded):
   __mock_python_command_succeeded.return_value = exists
   assert (
-    python_service.exists_python_module(__MODULE_NAME) == exists
+    python_handler.exists_python_module(__MODULE_NAME) == exists
   ), f"Function returns that module {message_fragment}."
 
 @pytest.mark.parametrize(
@@ -30,7 +30,7 @@ def test_returns_expected_value_when_checking_if_module_exists(exists, message_f
 def test_returns_expected_status_when_testing_python_command(return_code, succeeded, message_fragment, __mock_run_shell_command):
   __mock_run_shell_command.return_value = return_code, ""
   assert (
-    python_service.python_command_succeeded("test-command") == succeeded
+    python_handler.python_command_succeeded("test-command") == succeeded
   ), f"Command {message_fragment}."
 
 @pytest.mark.parametrize(
@@ -45,7 +45,7 @@ def test_returns_expected_status_when_testing_python_command(return_code, succee
 def test_returns_expected_statuses_when_running_parallel_function(params, n_errors, __mock_pool):
   params = [(str(param) if param else '') for param in params]
   assert (
-    len(python_service.run_function_in_parallel(ExitState, parallelizable_params=params)) == n_errors
+    len(python_handler.run_function_in_parallel(ExitState, parallelizable_params=params)) == n_errors
   ), "Parallel function call returned different number of errors than expected."
 
 class ExitState:
@@ -111,12 +111,12 @@ class PoolMock:
 
 @pytest.fixture
 def __mock_python_command_succeeded():
-  with patch("scipion_testrunner.repository.python_service.python_command_succeeded") as mock_method:
+  with patch("scipion_testrunner.domain.handlers.python_handler.python_command_succeeded") as mock_method:
     yield mock_method
 
 @pytest.fixture
 def __mock_run_shell_command():
-  with patch("scipion_testrunner.repository.shell_service.run_shell_command") as mock_method:
+  with patch("scipion_testrunner.domain.handlers.shell_handler.run_shell_command") as mock_method:
     yield mock_method
 
 @pytest.fixture

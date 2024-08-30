@@ -1,10 +1,10 @@
 import json
 from typing import Tuple, List, Dict
 
-from ...application.logger import logger
-from ..file_service import test_data_keys
+from scipion_testrunner.application.logger import logger
+from scipion_testrunner.configuration import test_data_keys
 
-def read_test_data_file(file_path: str) -> Tuple[List[str], Dict, Dict]:
+def get_test_config(file_path: str) -> Tuple[List[str], Dict, Dict]:
 	"""
 	### Returns a list with the necessary datasets for the tests, as well as 
 	### an object with the different tests, the situations where to skip them, 

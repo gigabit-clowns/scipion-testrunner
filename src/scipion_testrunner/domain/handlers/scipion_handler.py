@@ -1,8 +1,8 @@
 import multiprocessing
 from typing import List, Optional
 
-from ..application.logger import logger
-from . import shell_service, python_service
+from scipion_testrunner.application.logger import logger
+from scipion_testrunner.domain.handlers import python_handler, shell_handler
 
 def get_all_tests(scipion: str, plugin_module: str):
 	"""
@@ -15,12 +15,12 @@ def get_all_tests(scipion: str, plugin_module: str):
 	#### Returns:
 	- (list[str]): List of available tests
 	"""
-	ret_code, output = shell_service.run_shell_command(__get_scipion_test_search_param(scipion, plugin_module))
+	ret_code, output = shell_handler.run_shell_command(__get_scipion_test_search_param(scipion, plugin_module))
 	if ret_code:
 		logger.log_error(f"{output}\nERROR: Test search command failed. Check line above for more detailed info.", ret_code=ret_code)
 
 	test_list = __get_test_list_from_str(output, plugin_module)
-	if not test_list and not python_service.exists_python_module(plugin_module):
+	if not test_list and not python_handler.exists_python_module(plugin_module):
 		logger.log_error(f"ERROR: No tests were found for module {plugin_module}. Are you sure this module is properly installed?")
 	
 	return test_list
@@ -34,7 +34,7 @@ def download_datasets(scipion: str, datasets: List[str]):
 	- datasets (list[str]): List of datasets to download
 	"""
 	logger(logger.blue(f"Downloading {len(datasets)} datasets..."))
-	failed_downloads = python_service.run_function_in_parallel(
+	failed_downloads = python_handler.run_function_in_parallel(
 		__download_dataset,
 		scipion,
 		parallelizable_params=datasets,
@@ -148,7 +148,7 @@ def __download_dataset(dataset: str, scipion: str) -> Optional[str]:
 	- scipion (str): Path to Scipion's executable
 	"""
 	logger.log_warning(f"Downloading dataset {dataset}...")
-	ret_code, output = shell_service.run_shell_command(f"{scipion} testdata --download {dataset}")
+	ret_code, output = shell_handler.run_shell_command(f"{scipion} testdata --download {dataset}")
 	if ret_code:
 		logger(logger.red(f"{output}\nDataset {dataset} download failed with the above message."))
 		return dataset
@@ -174,7 +174,7 @@ def __run_test_batch(tests: List[str], max_jobs: int, scipion: str, plugin_modul
 	jobs_text = f"process{'es' if jobs > 1 else ''}"
 	batch_text = f" in batches of {jobs} {jobs_text}" if batch_size > 1 else ""
 	logger(logger.blue(f"Running a total of {batch_size} {test_number_text} for {plugin_module}{batch_text}..."))
-	return python_service.run_function_in_parallel(__run_test, scipion, plugin_module, parallelizable_params=tests, jobs=jobs)
+	return python_handler.run_function_in_parallel(__run_test, scipion, plugin_module, parallelizable_params=tests, jobs=jobs)
 
 def __run_test(test: str, scipion: str, plugin_module: str) -> Optional[str]:
 	"""
@@ -189,7 +189,7 @@ def __run_test(test: str, scipion: str, plugin_module: str) -> Optional[str]:
 	- (None | str): Test name if there were any errors
 	"""
 	logger.log_warning(f"Running test {test}...")
-	ret_code, output = shell_service.run_shell_command(f"{scipion} {__get_test_prefix(plugin_module)}{test}")
+	ret_code, output = shell_handler.run_shell_command(f"{scipion} {__get_test_prefix(plugin_module)}{test}")
 	if ret_code:
 		logger(logger.red(f"{output}\nTest {test} failed with above message."))
 		return test
