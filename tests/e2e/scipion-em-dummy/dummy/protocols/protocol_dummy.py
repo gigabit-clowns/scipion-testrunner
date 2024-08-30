@@ -1,6 +1,6 @@
 from pwem.protocols import EMProtocol
 from pyworkflow.utils import Message
-from pyworkflow.protocol import params
+from pyworkflow.protocol import params, Boolean
 
 class ProtDummy(EMProtocol):
   """
@@ -33,4 +33,4 @@ class ProtDummy(EMProtocol):
     """
     Returns the form input as output
     """
-    self._defineOutputs(**{self._OUTNAME: self.inputStatus.get()})
+    self._defineOutputs(**{self._OUTNAME: Boolean(self.inputStatus.get())})
