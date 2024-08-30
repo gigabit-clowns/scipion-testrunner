@@ -1,2 +1,2 @@
-from .test_root import TestRoot
-from .nested.test_nested import TestNested
+from .test_root import TestRoot as TestRoot
+from .nested.test_nested import TestNested as TestNested
