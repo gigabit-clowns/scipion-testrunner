@@ -3,7 +3,7 @@ from unittest.mock import patch, call, Mock
 import pytest
 
 from scipion_testrunner.application.logger import logger
-from scipion_testrunner.repository import scipion_service
+from scipion_testrunner.domain.handlers import scipion_handler
 
 __SCIPION = "scipion"
 __MODULE = "mymodule"
@@ -36,7 +36,7 @@ def test_exists_with_error_when_test_search_fails(__mock_run_shell_command, __mo
   error_text = "Test fail"
   __mock_run_shell_command.return_value = (1, error_text)
   with pytest.raises(SystemExit):
-    scipion_service.get_all_tests(__SCIPION, __MODULE)
+    scipion_handler.get_all_tests(__SCIPION, __MODULE)
   __mock_print.assert_called_once_with(
     logger.red(f"{error_text}\nERROR: Test search command failed. Check line above for more detailed info."),
     flush=True
@@ -45,7 +45,7 @@ def test_exists_with_error_when_test_search_fails(__mock_run_shell_command, __mo
 def test_exits_with_error_when_plugin_is_not_installed(__mock_run_shell_command, __mock_print, __mock_exists_module):
   __mock_exists_module.return_value = False
   with pytest.raises(SystemExit):
-    scipion_service.get_all_tests(__SCIPION, __MODULE)
+    scipion_handler.get_all_tests(__SCIPION, __MODULE)
   __mock_print.assert_called_once_with(
     logger.red(f"ERROR: No tests were found for module {__MODULE}. Are you sure this module is properly installed?"),
     flush=True
@@ -55,7 +55,7 @@ def test_returns_expected_test_list(__mock_run_shell_command, __mock_exists_modu
   __mock_run_shell_command.return_value = (0, __TEST_LIST_STRING)
   __mock_exists_module.return_value = True
   assert (
-    scipion_service.get_all_tests(__SCIPION, __MODULE) == [
+    scipion_handler.get_all_tests(__SCIPION, __MODULE) == [
       "workflows.test_workflow_xmipp_rct.TestXmippRCTWorkflow",
       "workflows.test_workflow_xmipp_ctf_consensus.TestCtfConsensus",
       "workflows.test_workflow_xmipp_assignment_tiltpairs.TestXmippAssignmentTiltPairsWorkflow",
@@ -65,7 +65,7 @@ def test_returns_expected_test_list(__mock_run_shell_command, __mock_exists_modu
 
 def test_prints_starting_message_when_downloading_datasets(__mock_print, __mock_run_function_in_parallel):
   __mock_run_function_in_parallel.return_value = []
-  scipion_service.download_datasets(__SCIPION, __DATASETS)
+  scipion_handler.download_datasets(__SCIPION, __DATASETS)
   __mock_print.assert_called_once_with(
     logger.blue(f"Downloading {len(__DATASETS)} datasets..."),
     flush=True
@@ -74,7 +74,7 @@ def test_prints_starting_message_when_downloading_datasets(__mock_print, __mock_
 def test_exits_with_error_when_downloading_datasets(__mock_print, __mock_run_function_in_parallel):
   __mock_run_function_in_parallel.return_value = [True]
   with pytest.raises(SystemExit):
-    scipion_service.download_datasets(__SCIPION, __DATASETS)
+    scipion_handler.download_datasets(__SCIPION, __DATASETS)
   __mock_print.assert_called_with(
     logger.red("The download of at least one dataset ended with errors. Exiting."),
     flush=True
@@ -86,7 +86,7 @@ def test_shows_expected_individual_download_warning_when_downloading_dataset(
   __mock_run_shell_command
 ):
   __mock_run_shell_command.return_value = (0, "")
-  scipion_service.__download_dataset(__DATASETS[0], __SCIPION)
+  scipion_handler.__download_dataset(__DATASETS[0], __SCIPION)
   __mock_log_warning.assert_called_once_with(f"Downloading dataset {__DATASETS[0]}...")
 
 def test_exits_with_error_when_downloading_individual_dataset(
@@ -96,7 +96,7 @@ def test_exits_with_error_when_downloading_individual_dataset(
 ):
   failure_message = "Test fail"
   __mock_run_shell_command.return_value = (1, failure_message)
-  scipion_service.__download_dataset(__DATASETS[0], __SCIPION)
+  scipion_handler.__download_dataset(__DATASETS[0], __SCIPION)
   __mock_print.assert_called_once_with(
     logger.red(f"{failure_message}\nDataset {__DATASETS[0]} download failed with the above message."),
     flush=True
@@ -108,14 +108,14 @@ def test_shows_expected_individual_download_success_message_when_downloading_ind
   __mock_run_shell_command
 ):
   __mock_run_shell_command.return_value = (0, "")
-  scipion_service.__download_dataset(__DATASETS[0], __SCIPION)
+  scipion_handler.__download_dataset(__DATASETS[0], __SCIPION)
   __mock_print.assert_called_once_with(
     logger.green(f"Dataset {__DATASETS[0]} download OK"),
     flush=True
   )
 
 def test_logs_expected_messages_when_running_tests(__mock_print, __mock_run_test_batch):
-  scipion_service.run_tests(__SCIPION, __TESTS, __TEST_BATCHES, 2, __MODULE)
+  scipion_handler.run_tests(__SCIPION, __TESTS, __TEST_BATCHES, 2, __MODULE)
   calls = [
     call(logger.blue("Initial run of non-dependent tests."), flush=True),
     call(logger.blue("Batch of dependent tests 1/2."), flush=True),
@@ -124,7 +124,7 @@ def test_logs_expected_messages_when_running_tests(__mock_print, __mock_run_test
   __mock_print.assert_has_calls(calls)
 
 def test_does_not_log_run_messages_when_running_tests(__mock_print, __mock_run_test_batch):
-  scipion_service.run_tests(__SCIPION, __TESTS, [], 2, __MODULE)
+  scipion_handler.run_tests(__SCIPION, __TESTS, [], 2, __MODULE)
   __mock_print.assert_not_called()
 
 @pytest.mark.parametrize(
@@ -146,11 +146,11 @@ def test_returns_expected_failed_tests_when_running_tests(failed_tests, expected
   mock_run_test_batch = Mock()
   mock_run_test_batch.side_effect = failed_tests
   with patch(
-		"scipion_testrunner.repository.scipion_service.__run_test_batch",
+		"scipion_testrunner.domain.handlers.scipion_handler.__run_test_batch",
 		new=mock_run_test_batch
 	):
     assert (
-      scipion_service.run_tests(__SCIPION, __TESTS.copy(), __TEST_BATCHES.copy(), 1, __MODULE) == expected_failed_total
+      scipion_handler.run_tests(__SCIPION, __TESTS.copy(), __TEST_BATCHES.copy(), 1, __MODULE) == expected_failed_total
     ), "Received different failed tests than expected"
 
 @pytest.mark.parametrize(
@@ -171,16 +171,16 @@ def test_logs_expected_message_when_running_test_batch(
   __mock_print,
   __mock_run_function_in_parallel
 ):
-  scipion_service.__run_test_batch(batch, max_jobs, __SCIPION, __MODULE)
+  scipion_handler.__run_test_batch(batch, max_jobs, __SCIPION, __MODULE)
   __mock_print.assert_called_once_with(
     logger.blue(f"Running a total of {len(batch)} {test_number_text} for {__MODULE}{batch_text}..."),
     flush=True
   )
 
 def test_runs_function_in_parallel(__mock_print, __mock_run_function_in_parallel):
-  scipion_service.__run_test_batch(__TESTS, 5, __SCIPION, __MODULE)
+  scipion_handler.__run_test_batch(__TESTS, 5, __SCIPION, __MODULE)
   __mock_run_function_in_parallel.assert_called_once_with(
-    scipion_service.__run_test,
+    scipion_handler.__run_test,
     __SCIPION,
     __MODULE,
     parallelizable_params=__TESTS,
@@ -192,7 +192,7 @@ def test_logs_expected_initial_warning_when_running_test(
   __mock_run_shell_command,
   __mock_print
 ):
-  scipion_service.__run_test(__TESTS[0], __SCIPION, __MODULE)
+  scipion_handler.__run_test(__TESTS[0], __SCIPION, __MODULE)
   __mock_log_warning.assert_called_once_with(f"Running test {__TESTS[0]}...")
 
 @pytest.mark.parametrize(
@@ -211,7 +211,7 @@ def test_logs_expected_message_when_running_test(
   __mock_print
 ):
   __mock_run_shell_command.return_value = (return_code, output)
-  scipion_service.__run_test(__TESTS[0], __SCIPION, __MODULE)
+  scipion_handler.__run_test(__TESTS[0], __SCIPION, __MODULE)
   __mock_print.assert_called_once_with(expected_message, flush=True)
 
 @pytest.mark.parametrize(
@@ -230,18 +230,18 @@ def test_returns_expected_output_when_running_test(
 ):
   __mock_run_shell_command.return_value = (return_code, "")
   assert (
-    scipion_service.__run_test(__TESTS[0], __SCIPION, __MODULE) == expected_return
+    scipion_handler.__run_test(__TESTS[0], __SCIPION, __MODULE) == expected_return
   )
 
 @pytest.mark.parametrize("plugin", [pytest.param(''), pytest.param("test_name")])
 def test_returns_expected_test_prefix(plugin):
   assert (
-    scipion_service.__get_test_prefix(plugin) == f'tests {plugin}.tests.'
+    scipion_handler.__get_test_prefix(plugin) == f'tests {plugin}.tests.'
   )
 
 @pytest.fixture
 def __mock_run_shell_command():
-  with patch("scipion_testrunner.repository.shell_service.run_shell_command") as mock_method:
+  with patch("scipion_testrunner.domain.handlers.shell_handler.run_shell_command") as mock_method:
     mock_method.return_value = (0, "")
     yield mock_method
 
@@ -252,12 +252,12 @@ def __mock_print():
 
 @pytest.fixture
 def __mock_exists_module():
-  with patch("scipion_testrunner.repository.python_service.exists_python_module") as mock_method:
+  with patch("scipion_testrunner.domain.handlers.python_handler.exists_python_module") as mock_method:
     yield mock_method
 
 @pytest.fixture
 def __mock_run_function_in_parallel():
-  with patch("scipion_testrunner.repository.python_service.run_function_in_parallel") as mock_method:
+  with patch("scipion_testrunner.domain.handlers.python_handler.run_function_in_parallel") as mock_method:
     yield mock_method
 
 @pytest.fixture
@@ -267,6 +267,6 @@ def __mock_log_warning():
 
 @pytest.fixture
 def __mock_run_test_batch():
-  with patch("scipion_testrunner.repository.scipion_service.__run_test_batch") as mock_method:
+  with patch("scipion_testrunner.domain.handlers.scipion_handler.__run_test_batch") as mock_method:
     mock_method.return_value = []
     yield mock_method

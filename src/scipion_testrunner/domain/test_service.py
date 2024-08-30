@@ -1,11 +1,11 @@
 import sys
 from typing import Dict, List, Tuple
 
-from ..repository.file_service import file_service
+from scipion_testrunner.configuration import test_config
 
-from ..application.logger import logger
-from ..repository import scipion_service, python_service
-from ..repository.file_service import test_data_keys
+from scipion_testrunner.application.logger import logger
+from scipion_testrunner.domain.handlers import python_handler, scipion_handler
+from scipion_testrunner.configuration import test_data_keys
 
 SCIPION_PARAM_NAME = "scipion"
 PLUGIN_PARAM_NAME = "plugin"
@@ -20,11 +20,11 @@ def test_scipion_plugin(args: Dict):
 	#### Params:
 	- args (dict): Dictionary containing all the command-line args
 	"""
-	tests = scipion_service.get_all_tests(args[SCIPION_PARAM_NAME], args[PLUGIN_PARAM_NAME])
+	tests = scipion_handler.get_all_tests(args[SCIPION_PARAM_NAME], args[PLUGIN_PARAM_NAME])
 	if not tests:
 		logger.log_warning(f"Module {args[PLUGIN_PARAM_NAME]} has not tests. Nothing to run.")
 		sys.exit(0)
-	data_sets, skippable_tests, tests_with_deps = file_service.read_test_data_file(args[TEST_DATA_PARAM_NAME])
+	data_sets, skippable_tests, tests_with_deps = test_config.get_test_config(args[TEST_DATA_PARAM_NAME])
 	tests = __remove_skippable_tests(tests, skippable_tests, args[NO_GPU_PARAM_NAME])
 	tests, tests_with_deps = __remove_circular_dependencies(tests, tests_with_deps)
 	tests, tests_with_deps = __remove_unmet_internal_dependency_tests(tests, tests_with_deps)
@@ -32,9 +32,9 @@ def test_scipion_plugin(args: Dict):
 		logger.log_warning("There are no tests left. Nothing to run.")
 		sys.exit(0)
 	if data_sets:
-		scipion_service.download_datasets(args[SCIPION_PARAM_NAME], data_sets)
+		scipion_handler.download_datasets(args[SCIPION_PARAM_NAME], data_sets)
 	tests, test_batches = __generate_sorted_test_batches(tests, tests_with_deps)
-	failed_tests = scipion_service.run_tests(
+	failed_tests = scipion_handler.run_tests(
 		args[SCIPION_PARAM_NAME],
 		tests.copy(),
 		test_batches,
@@ -200,7 +200,7 @@ def __remove_dependency_tests(tests: List[str], dependency_tests: List[Dict]) ->
 		plugin_name = dependency.get(test_data_keys.SKIPPABLE_DEPENDENCIES_NAME_KEY)
 		module_name = dependency.get(test_data_keys.SKIPPABLE_DEPENDENCIES_MODULE_KEY)
 		is_plugin = dependency.get(test_data_keys.SKIPPABLE_DEPENDENCIES_IS_PLUGIN_KEY, True)
-		if module_name and python_service.exists_python_module(module_name):
+		if module_name and python_handler.exists_python_module(module_name):
 			continue
 		for dependency_test in dependency.get(test_data_keys.SKIPPABLE_DEPENDENCIES_TESTS_KEY, []):
 			if dependency_test in tests:

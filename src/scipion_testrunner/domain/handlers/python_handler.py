@@ -1,7 +1,7 @@
 import multiprocessing
 from typing import Callable, List
 
-from . import shell_service
+from scipion_testrunner.domain.handlers import shell_handler
 
 def exists_python_module(module_name: str) -> bool:
 	"""
@@ -25,7 +25,7 @@ def python_command_succeeded(command: str) -> bool:
 	#### Returns:
 	- (bool): True if command succeeded, False otherwise
 	"""
-	return not bool(shell_service.run_shell_command(f"python -c '{command}'")[0])
+	return not bool(shell_handler.run_shell_command(f"python -c '{command}'")[0])
 
 def run_function_in_parallel(func: Callable, *args, parallelizable_params: List[str], jobs: int=multiprocessing.cpu_count()) -> List:
 	"""

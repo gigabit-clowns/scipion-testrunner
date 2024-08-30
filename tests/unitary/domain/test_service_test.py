@@ -3,7 +3,7 @@ from unittest.mock import patch, Mock, call
 import pytest
 
 from scipion_testrunner.application.logger import logger
-from scipion_testrunner.repository.file_service import test_data_keys
+from scipion_testrunner.configuration import test_data_keys
 from scipion_testrunner.domain import test_service
 
 __SCIPION = test_service.SCIPION_PARAM_NAME
@@ -55,7 +55,7 @@ def test_logs_warning_when_there_are_not_tests_while_testing_scipion_plugin(__mo
 
 def test_exits_success_when_all_tests_get_removed_when_testing_scipion_plugin(
 	__mock_get_all_tests,
-	__mock_read_test_data_file,
+	__mock_get_test_config,
 	__mock_remove_skippable_tests,
 	__mock_log_warning
 ):
@@ -66,7 +66,7 @@ def test_exits_success_when_all_tests_get_removed_when_testing_scipion_plugin(
 
 def test_logs_warning_when_all_tests_get_removed_when_testing_scipion_plugin(
 	__mock_get_all_tests,
-	__mock_read_test_data_file,
+	__mock_get_test_config,
 	__mock_remove_skippable_tests,
 	__mock_log_warning
 ):
@@ -77,7 +77,7 @@ def test_logs_warning_when_all_tests_get_removed_when_testing_scipion_plugin(
 
 def test_calls_download_datasets_when_testing_scipion_plugin(
 	__mock_get_all_tests,
-	__mock_read_test_data_file,
+	__mock_get_test_config,
 	__mock_remove_skippable_tests,
 	__mock_remove_circular_dependencies,
 	__mock_remove_unmet_internal_dependency_tests,
@@ -93,7 +93,7 @@ def test_calls_download_datasets_when_testing_scipion_plugin(
 
 def test_not_calls_download_datasets_when_testing_scipion_plugin(
 	__mock_get_all_tests,
-	__mock_read_test_data_file,
+	__mock_get_test_config,
 	__mock_remove_skippable_tests,
 	__mock_download_datasets,
 	__mock_run_tests,
@@ -101,14 +101,14 @@ def test_not_calls_download_datasets_when_testing_scipion_plugin(
 	__mock_log_result_summary,
 	__mock_print
 ):
-	__mock_read_test_data_file.return_value = ([], __SKIPPABLE, __INTERNAL_DEPENDENCIES)
+	__mock_get_test_config.return_value = ([], __SKIPPABLE, __INTERNAL_DEPENDENCIES)
 	__mock_remove_skippable_tests.return_value = __TESTS
 	test_service.test_scipion_plugin(__ARGS)
 	__mock_download_datasets.assert_not_called()
 
 def test_calls_run_tests_when_testing_scipion_plugin(
 	__mock_get_all_tests,
-	__mock_read_test_data_file,
+	__mock_get_test_config,
 	__mock_remove_skippable_tests,
 	__mock_remove_circular_dependencies,
 	__mock_remove_unmet_internal_dependency_tests,
@@ -132,7 +132,7 @@ def test_calls_run_tests_when_testing_scipion_plugin(
 
 def test_calls_log_result_summary_when_testing_scipion_plugin(
 	__mock_get_all_tests,
-	__mock_read_test_data_file,
+	__mock_get_test_config,
 	__mock_remove_skippable_tests,
 	__mock_remove_circular_dependencies,
 	__mock_remove_unmet_internal_dependency_tests,
@@ -150,7 +150,7 @@ def test_calls_log_result_summary_when_testing_scipion_plugin(
 
 def test_logs_error_with_failed_tests_when_testing_scipion_plugin(
 	__mock_get_all_tests,
-	__mock_read_test_data_file,
+	__mock_get_test_config,
 	__mock_remove_skippable_tests,
 	__mock_remove_circular_dependencies,
 	__mock_remove_unmet_internal_dependency_tests,
@@ -170,7 +170,7 @@ def test_logs_error_with_failed_tests_when_testing_scipion_plugin(
 
 def test_logs_success_message_without_failed_tests_when_testing_scipion_plugin(
 	__mock_get_all_tests,
-	__mock_read_test_data_file,
+	__mock_get_test_config,
 	__mock_remove_skippable_tests,
 	__mock_remove_circular_dependencies,
 	__mock_remove_unmet_internal_dependency_tests,
@@ -287,7 +287,7 @@ def test_removes_expected_dependency_tests(
 		test_data_keys.SKIPPABLE_DEPENDENCIES_TESTS_KEY: [test]
 	} for test in to_remove]
 	with patch(
-		"scipion_testrunner.repository.python_service.exists_python_module",
+		"scipion_testrunner.domain.handlers.python_handler.exists_python_module",
 		new=mock_exists_python_module
 	):
 		assert (
@@ -583,7 +583,7 @@ def test_logs_expected_messages_in_summary_report(__mock_print):
 
 @pytest.fixture
 def __mock_get_all_tests():
-	with patch("scipion_testrunner.repository.scipion_service.get_all_tests") as mock_method:
+	with patch("scipion_testrunner.domain.handlers.scipion_handler.get_all_tests") as mock_method:
 		mock_method.return_value = __TESTS
 		yield mock_method
 
@@ -593,8 +593,8 @@ def __mock_log_warning():
 		yield mock_method
 
 @pytest.fixture
-def __mock_read_test_data_file():
-	with patch("scipion_testrunner.repository.file_service.file_service.read_test_data_file") as mock_method:
+def __mock_get_test_config():
+	with patch("scipion_testrunner.configuration.test_config.get_test_config") as mock_method:
 		mock_method.return_value = (__DATASETS, __SKIPPABLE, __INTERNAL_DEPENDENCIES)
 		yield mock_method
 
@@ -605,12 +605,12 @@ def __mock_remove_skippable_tests():
 
 @pytest.fixture
 def __mock_download_datasets():
-	with patch("scipion_testrunner.repository.scipion_service.download_datasets") as mock_method:
+	with patch("scipion_testrunner.domain.handlers.scipion_handler.download_datasets") as mock_method:
 		yield mock_method
 
 @pytest.fixture
 def __mock_run_tests():
-	with patch("scipion_testrunner.repository.scipion_service.run_tests") as mock_method:
+	with patch("scipion_testrunner.domain.handlers.scipion_handler.run_tests") as mock_method:
 		mock_method.return_value = []
 		yield mock_method
 
@@ -639,7 +639,7 @@ def __mock_log_skip_gpu_test():
 
 @pytest.fixture
 def __mock_exists_python_module(request):
-	with patch("scipion_testrunner.repository.python_service.exists_python_module") as mock_method:
+	with patch("scipion_testrunner.domain.handlers.python_handler.exists_python_module") as mock_method:
 		mock_method.return_value = request.param if hasattr(request, "param") else False
 		yield mock_method
 
