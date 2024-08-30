@@ -1,7 +1,7 @@
 {
   "datasets": [
     "mda",
-    "emx"
+    "eman"
   ],
   "skippable": {
     "gpu": [],
