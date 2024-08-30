@@ -47,8 +47,8 @@ jobs:
         working-directory: ${{ github.workspace }}/../scipion
         run: ./scipion3 installp -p ${{ github.workspace }}/tests/e2e/scipion-em-dummy --devel
       
-      #- name: Run E2E test
-      #  env:
-      #    TEST_MODULE: dummy
-      #  working-directory: ${{ github.workspace }}/../
-      #  run: scipion_testrunner ./scipion/scipion3 $TEST_MODULE --noGpu --testData=${{ github.workspace }}/tests/e2e/scipion-em-$TEST_MODULE/$TEST_MODULE/testData.json
+      - name: Run E2E test
+        env:
+          TEST_MODULE: dummy
+        working-directory: ${{ github.workspace }}/../
+        run: scipion_testrunner ./scipion/scipion3 $TEST_MODULE --noGpu --testData=${{ github.workspace }}/tests/e2e/scipion-em-$TEST_MODULE/$TEST_MODULE/testData.json
