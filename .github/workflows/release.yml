@@ -22,21 +22,19 @@ jobs:
     
     - name: Get package version
       id: version
-      env:
-        MODULE_NAME: ${{ variables.MODULE_NAME }}
       run: |
-        export VERSION=$(pip show $MODULE_NAME | grep Version | awk '{print $2}')
+        export VERSION=$(pip show ${{ vars.MODULE_NAME }} | grep Version | awk '{print $2}')
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
         echo "Version number: $VERSION"
     
     - name: Build and publish
       env:
-        TWINE_USERNAME: ${{ variables.PYPI_USERNAME }}
+        TWINE_USERNAME: ${{ vars.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
         python -m build
-        echo ${{ variables.PYPI_USERNAME }}
-    #    twine upload --repository ${{ variables.MODULE_NAME }} dist/*
+        echo ${{ vars.PYPI_USERNAME }}
+        twine upload --repository ${{ variables.MODULE_NAME }} dist/*
     
     - name: Generate tag
       id: tag_version
