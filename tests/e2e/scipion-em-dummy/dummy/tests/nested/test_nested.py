@@ -8,7 +8,7 @@ class TestNested(BaseTest):
     setupTestProject(cls)
   
   def __run_dummy(self, status: bool) -> bool:
-    prot_dummy = self.newProtocol(ProtDummy, {"inputStatus": status})
+    prot_dummy = self.newProtocol(ProtDummy, inputStatus=status)
     self.launchProtocol(prot_dummy)
     return getattr(prot_dummy, prot_dummy._OUTNAME)
 
