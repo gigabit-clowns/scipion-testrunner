@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "scipion-testrunner"
-version = "0.0.1"
+version = "1.0.0"
 description = "Module to handle in an efficient way the execution of Scipion tests"
 authors = ["Martín Salinas <ssalinasmartin@gmail.com>"]
 readme = "README.md"
