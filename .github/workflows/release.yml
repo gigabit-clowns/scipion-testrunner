@@ -33,7 +33,6 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
         python -m build
-        echo ${{ vars.PYPI_USERNAME }}
         twine upload --repository ${{ vars.MODULE_NAME }} dist/*
     
     - name: Generate tag
