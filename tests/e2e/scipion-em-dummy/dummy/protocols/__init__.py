@@ -1,1 +1,1 @@
-from .protocol_dummy import ProtDummy
+from .protocol_dummy import ProtDummy as ProtDummy
