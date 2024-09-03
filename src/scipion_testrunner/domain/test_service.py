@@ -144,8 +144,8 @@ def __group_tests_by_file(tests: List[str]) -> Dict[str, List[str]]:
 	"""
 	grouped_tests = {}
 	for test in tests:
-		origin_file, test_name = test.split('.', 1)
-		grouped_tests.setdefault(origin_file, []).append(test_name)
+		full_path = test.split(".")
+		grouped_tests.setdefault('.'.join(full_path[:-1]), []).append(full_path[-1])
 	return grouped_tests
 
 ############################ REMOVAL FUNCTIONS ############################
