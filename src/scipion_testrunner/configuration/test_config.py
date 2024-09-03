@@ -22,7 +22,7 @@ def get_test_config(file_path: str) -> Tuple[List[str], Dict, Dict]:
         logger(logger.yellow("No skippable tests file provided, running all."))
         return [], {}, {}
     try:
-        with open(file_path, "r") as file:
+        with open(file_path) as file:
             data_file = json.load(file)
             return (
                 data_file.get(test_data_keys.DATASETS_KEY, []),
