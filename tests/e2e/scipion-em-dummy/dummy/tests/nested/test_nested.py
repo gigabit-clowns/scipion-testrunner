@@ -1,19 +1,8 @@
-from pyworkflow.tests import BaseTest, setupTestProject
+from ..test_base import TestBase
 
-from ...protocols import ProtDummy
-
-class TestNested(BaseTest):
-  @classmethod
-  def setUpClass(cls):
-    setupTestProject(cls)
-  
-  def __run_dummy(self, status: bool) -> bool:
-    prot_dummy = self.newProtocol(ProtDummy, inputStatus=status)
-    self.launchProtocol(prot_dummy)
-    return getattr(prot_dummy, prot_dummy._OUTNAME)
-
+class TestNested(TestBase):
   def test_true(self):
-    self.assertTrue(self.__run_dummy(True))
+    self.assertTrue(self._run_dummy(True))
 
   def test_false(self):
-    self.assertFalse(self.__run_dummy(False))
+    self.assertFalse(self._run_dummy(False))
