@@ -534,11 +534,13 @@ def test_returns_expected_grouped_tests():
 			[
 				f"{file1_name}.{__TESTS[0]}",
 				f"{file1_name}.{__TESTS[1]}",
-				f"{file2_name}.{__TESTS[0]}"
+				f"{file2_name}.{__TESTS[0]}",
+				f"folder.{file1_name}.{__TESTS[0]}"
 			]
 		) == {
 			file1_name: [__TESTS[0], __TESTS[1]],
-			file2_name: [__TESTS[0]]
+			file2_name: [__TESTS[0]],
+			f"folder.{file1_name}": [__TESTS[0]]
 		}
 	), "Received different test grouping than expected"
 
