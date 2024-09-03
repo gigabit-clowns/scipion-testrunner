@@ -39,7 +39,6 @@ jobs:
         run: |
           pip install --user scipion-installer
           python -m scipioninstaller -conda -noXmipp -noAsk scipion
-          ./scipion/scipion3 tests --grep pwem && false
     
       - name: Install project
         run: pip install -e .
