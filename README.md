@@ -8,4 +8,4 @@ This Python module needs to be installed in an enviroment with an installation o
 To install this package, activate the enviroment that contains Scipion, and run `pip install scipion-testrunner`.
 
 ## Usage
-To view the usage guide, run `scipion-testrunner -h`.
+To view the usage guide, run `scipion_testrunner -h`.
