@@ -6,8 +6,10 @@ import pwem
 
 __version__ = "1.0"
 
+
 class Plugin(pwem.Plugin):
-  """
-  Dummy plugin class
-  """
-  pass
+    """
+    Dummy plugin class
+    """
+
+    pass
