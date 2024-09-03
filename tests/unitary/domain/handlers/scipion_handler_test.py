@@ -26,6 +26,8 @@ Scanning tests...
    scipion3 tests {__MODULE}.tests.workflows.test_workflow_xmipp_assignment_tiltpairs.TestXmippAssignmentTiltPairsWorkflow
  scipion3 tests {__MODULE}.tests.workflows.test_workflow_xmipp
    scipion3 tests {__MODULE}.tests.workflows.test_workflow_xmipp.TestXmippWorkflow
+ scipion3 tests {__MODULE}.tests.test_convert_atom_struct
+   scipion3 tests {__MODULE}.tests.test_convert_atom_struct.TestAtomicStructHandler
 """
 __DATASETS = ["dataset_1", "dataset_2"]
 __ALL_TESTS = [f"test_{i}" for i in range(10)]
@@ -59,9 +61,10 @@ def test_returns_expected_test_list(__mock_run_shell_command, __mock_exists_modu
       "workflows.test_workflow_xmipp_rct.TestXmippRCTWorkflow",
       "workflows.test_workflow_xmipp_ctf_consensus.TestCtfConsensus",
       "workflows.test_workflow_xmipp_assignment_tiltpairs.TestXmippAssignmentTiltPairsWorkflow",
-      "workflows.test_workflow_xmipp.TestXmippWorkflow"
+      "workflows.test_workflow_xmipp.TestXmippWorkflow",
+      "test_convert_atom_struct.TestAtomicStructHandler"
     ]
-  )
+  ), "Received different tests than expected"
 
 def test_prints_starting_message_when_downloading_datasets(__mock_print, __mock_run_function_in_parallel):
   __mock_run_function_in_parallel.return_value = []
