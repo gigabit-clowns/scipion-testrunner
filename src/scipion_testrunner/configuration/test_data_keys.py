@@ -1,3 +1,5 @@
+"""### Keys of the test's configuration JSON file."""
+
 DATASETS_KEY = "datasets"
 SKIPPABLE_TESTS_KEY = "skippable"
 TEST_INTERNAL_DEPENDENCIES_KEY = "test-dependencies"

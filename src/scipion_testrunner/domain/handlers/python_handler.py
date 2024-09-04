@@ -1,3 +1,5 @@
+"""### Functions that interact with Python via shell."""
+
 import multiprocessing
 from typing import Callable, List
 
@@ -6,13 +8,13 @@ from scipion_testrunner.domain.handlers import shell_handler
 
 def exists_python_module(module_name: str) -> bool:
     """
-    ### Checks if a given Python module exists
+    ### Checks if a given Python module exists.
 
     #### Params:
-    - module_name (str): Name of the Python module
+    - module_name (str): Name of the Python module.
 
     #### Returns:
-    - (bool): True if exist, False otherwise
+    - (bool): True if exist, False otherwise.
     """
     return python_command_succeeded(f"import {module_name}")
 
@@ -22,10 +24,10 @@ def python_command_succeeded(command: str) -> bool:
     ### This function executes the given Python command and the status of it.
 
     #### Params:
-    - command (str): Command to test
+    - command (str): Command to test.
 
     #### Returns:
-    - (bool): True if command succeeded, False otherwise
+    - (bool): True if command succeeded, False otherwise.
     """
     return not bool(shell_handler.run_shell_command(f"python -c '{command}'")[0])
 
@@ -37,16 +39,16 @@ def run_function_in_parallel(
     jobs: int = multiprocessing.cpu_count(),
 ) -> List:
     """
-    ### Runs the given Python function in parallel
+    ### Runs the given Python function in parallel.
 
     #### Params:
-    - func (callable): Function to run in parallel
-    - *args (tuple): Contains the params needed by the function
-    - parallelizable_params (list[str]): List of main params to parallelize from
-    - max_jobs (int): Maximum number of jobs
+    - func (callable): Function to run in parallel.
+    - *args (tuple): Contains the params needed by the function.
+    - parallelizable_params (list[str]): List of main params to parallelize from.
+    - max_jobs (int): Maximum number of jobs.
 
     #### Returns:
-    - (list): Failed commands
+    - (list): Failed commands.
     """
     pool = multiprocessing.Pool(processes=jobs)
     results = [

@@ -1,3 +1,5 @@
+"""### Functions that interact with Scipion."""
+
 import multiprocessing
 from typing import List, Optional
 
@@ -7,14 +9,14 @@ from scipion_testrunner.domain.handlers import python_handler, shell_handler
 
 def get_all_tests(scipion: str, plugin_module: str):
     """
-    ### Finds the full list of tests from a given module
+    ### Finds the full list of tests from a given module.
 
     #### Params:
-    - scipion (str): Path to Scipion's executable
-    - plugin_module (str): Module name of the plugin to obtain tests from
+    - scipion (str): Path to Scipion's executable.
+    - plugin_module (str): Module name of the plugin to obtain tests from.
 
     #### Returns:
-    - (list[str]): List of available tests
+    - (list[str]): List of available tests.
     """
     ret_code, output = shell_handler.run_shell_command(
         __get_scipion_test_search_param(scipion, plugin_module)
@@ -36,11 +38,11 @@ def get_all_tests(scipion: str, plugin_module: str):
 
 def download_datasets(scipion: str, datasets: List[str]):
     """
-    ### Downloads the given list of datasets
+    ### Downloads the given list of datasets.
 
     #### Params:
-    - scipion (str): Path to Scipion's executable
-    - datasets (list[str]): List of datasets to download
+    - scipion (str): Path to Scipion's executable.
+    - datasets (list[str]): List of datasets to download.
     """
     logger(logger.blue(f"Downloading {len(datasets)} datasets..."))
     failed_downloads = python_handler.run_function_in_parallel(
@@ -63,17 +65,17 @@ def run_tests(
     plugin_module: str,
 ) -> List[str]:
     """
-    ### Runs the given tests and returns the name of the failed ones
+    ### Runs the given tests and returns the name of the failed ones.
 
     #### Params:
-    - scipion (str): Path to Scipion's executable
-    - tests (list[str]): List of tests to run
-    - test_batches (list[list[str]]): Test batches to run in order
-    - max_jobs (int): Maximum number of concurrent jobs
-    - plugin_module (str): Module name of the plugin to run tests for
+    - scipion (str): Path to Scipion's executable.
+    - tests (list[str]): List of tests to run.
+    - test_batches (list[list[str]]): Test batches to run in order.
+    - max_jobs (int): Maximum number of concurrent jobs.
+    - plugin_module (str): Module name of the plugin to run tests for.
 
     #### Returns:
-    - (list[str]): Names of the tests that failed
+    - (list[str]): Names of the tests that failed.
     """
     if test_batches:
         logger(logger.blue("Initial run of non-dependent tests."))
@@ -92,14 +94,14 @@ def run_tests(
 
 def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]:
     """
-    ### Return the list of tests given a command text
+    ### Return the list of tests given a command text.
 
     #### Param:
-    - command_text (str): Command text containing the list of tests inside it
-    - plugin_module (str): Module name of the plugin to obtain tests from
+    - command_text (str): Command text containing the list of tests inside it.
+    - plugin_module (str): Module name of the plugin to obtain tests from.
 
     #### Returns:
-    - (list[str]): List of tests present in the command text
+    - (list[str]): List of tests present in the command text.
     """
     lines = command_text.split("\n")
     tests = []
@@ -116,48 +118,48 @@ def __get_scipion_test_search_param(scipion: str, plugin_module: str) -> str:
     ### Returns the Scipion test search param for a given plugin module.
 
     #### Params:
-    - scipion (str): Path to Scipion's executable
-    - plugin_module (str): Module name of the plugin to obtain tests from
+    - scipion (str): Path to Scipion's executable.
+    - plugin_module (str): Module name of the plugin to obtain tests from.
     """
     return f"{scipion} test --grep {plugin_module}"
 
 
 def __get_test_leading_chars(plugin_module: str) -> str:
     """
-    ### Returns the leading characters of every test string
+    ### Returns the leading characters of every test string.
 
     #### Params:
-    - plugin_module (str): Module name of the plugin to obtain tests from
+    - plugin_module (str): Module name of the plugin to obtain tests from.
 
     #### Returns:
-    - (str): Leading characters of test strings
+    - (str): Leading characters of test strings.
     """
     return f"tests {plugin_module}.tests."
 
 
 def __get_full_test_leading_chars(plugin_module: str) -> str:
     """
-    ### Returns the leading characters of every full test string
+    ### Returns the leading characters of every full test string.
 
     #### Params:
-    - plugin_module (str): Module name of the plugin to obtain tests from
+    - plugin_module (str): Module name of the plugin to obtain tests from.
 
     #### Returns:
-    - (str): Leading characters of full test strings
+    - (str): Leading characters of full test strings.
     """
     return f"scipion3 {__get_test_leading_chars(plugin_module)}"
 
 
 def __is_test_line(line: str, plugin_module: str) -> bool:
     """
-    ### Checks if the given line corresponds to a test
+    ### Checks if the given line corresponds to a test.
 
     #### Params:
-    - line (str): Line to check
-    - plugin_module (str): Module name of the plugin to obtain tests from
+    - line (str): Line to check.
+    - plugin_module (str): Module name of the plugin to obtain tests from.
 
     #### Returns:
-    - (bool): True if the line corresponds to a test, False otherwise
+    - (bool): True if the line corresponds to a test, False otherwise.
     """
     if not line.startswith(__get_full_test_leading_chars(plugin_module)):
         return False
@@ -167,11 +169,11 @@ def __is_test_line(line: str, plugin_module: str) -> bool:
 
 def __download_dataset(dataset: str, scipion: str) -> Optional[str]:
     """
-    ### Downloads the given dataset
+    ### Downloads the given dataset.
 
     #### Params:
-    - dataset (str): Dataset to download
-    - scipion (str): Path to Scipion's executable
+    - dataset (str): Dataset to download.
+    - scipion (str): Path to Scipion's executable.
     """
     logger.log_warning(f"Downloading dataset {dataset}...")
     ret_code, output = shell_handler.run_shell_command(
@@ -192,16 +194,16 @@ def __run_test_batch(
     tests: List[str], max_jobs: int, scipion: str, plugin_module: str
 ) -> List[str]:
     """
-    ### Runs the given test batch
+    ### Runs the given test batch.
 
     #### Params:
-    - tests (list[str]): Tests in the batch
-    - max_jobs (int): Maximum number of concurrent jobs
-    - scipion (str): Path to Scipion's executable
-    - plugin_module (str): Module name of the plugin to run tests for
+    - tests (list[str]): Tests in the batch.
+    - max_jobs (int): Maximum number of concurrent jobs.
+    - scipion (str): Path to Scipion's executable.
+    - plugin_module (str): Module name of the plugin to run tests for.
 
     #### Returns:
-    - (list[str]): Tests that failed
+    - (list[str]): Tests that failed.
     """
     batch_size = len(tests)
     jobs = batch_size if batch_size < max_jobs else max_jobs
@@ -220,15 +222,15 @@ def __run_test_batch(
 
 def __run_test(test: str, scipion: str, plugin_module: str) -> Optional[str]:
     """
-    ### Runs a given test
+    ### Runs a given test.
 
     #### Params:
-    - test (str): Test name
-    - scipion (str): Path to Scipion's executable
-    - plugin_module (str): Module name of the plugin to run test for
+    - test (str): Test name.
+    - scipion (str): Path to Scipion's executable.
+    - plugin_module (str): Module name of the plugin to run test for.
 
     #### Return:
-    - (None | str): Test name if there were any errors
+    - (None | str): Test name if there were any errors.
     """
     logger.log_warning(f"Running test {test}...")
     ret_code, output = shell_handler.run_shell_command(
@@ -243,12 +245,12 @@ def __run_test(test: str, scipion: str, plugin_module: str) -> Optional[str]:
 
 def __get_test_prefix(plugin_module: str):
     """
-    ### Returns Scipion's prefix for test names
+    ### Returns Scipion's prefix for test names.
 
     #### Params:
-    - plugin_module (str): Module name of the plugin
+    - plugin_module (str): Module name of the plugin.
 
     #### Returns:
-    - (str): Test prefix
+    - (str): Test prefix.
     """
     return f"tests {plugin_module}.tests."

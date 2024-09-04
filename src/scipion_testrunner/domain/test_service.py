@@ -1,3 +1,5 @@
+"""### Performs the main high-level steps of the workflow required to test a plugin."""
+
 import sys
 from typing import Dict, List, Tuple
 
@@ -16,10 +18,10 @@ TEST_DATA_PARAM_NAME = "testData"
 
 def test_scipion_plugin(args: Dict):
     """
-    ### Handles the full test execution of a Scipion plugin
+    ### Handles the full test execution of a Scipion plugin.
 
     #### Params:
-    - args (dict): Dictionary containing all the command-line args
+    - args (dict): Dictionary containing all the command-line args.
     """
     tests = scipion_handler.get_all_tests(
         args[SCIPION_PARAM_NAME], args[PLUGIN_PARAM_NAME]
@@ -89,15 +91,15 @@ def __generate_sorted_test_batches(
     tests: List[str], tests_with_deps: Dict[str, List[str]]
 ) -> Tuple[List[str], List[List[str]]]:
     """
-    ### Generates the list of test batches to be executed in order
+    ### Generates the list of test batches to be executed in order.
 
     #### Params:
-    - tests (list[str]): Full list of tests
-    - tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies
+    - tests (list[str]): Full list of tests.
+    - tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies.
 
     #### Returns:
-    - (list[str]): All remaining independent tests
-    - (list[list[str]]): List of test batches
+    - (list[str]): All remaining independent tests.
+    - (list[list[str]]): List of test batches.
     """
     test_batches = []
     while tests_with_deps:
@@ -120,7 +122,7 @@ def __get_test_batch(test_with_deps: Dict[str, List[str]]) -> List[str]:
     - tests_with_deps (dict[str, list[str]]): Dictionary containing tests that depend on other tests.
 
     #### Returns:
-    - (list[str]): Next test batch to run
+    - (list[str]): Next test batch to run.
     """
     batch = []
     for test, deps in list(test_with_deps.items()):
@@ -133,14 +135,14 @@ def __get_sorted_results(
     tests: List[str], failed_tests: List[str]
 ) -> Dict[str, List[str]]:
     """
-    ### Groups the passed/failed test results by origin file
+    ### Groups the passed/failed test results by origin file.
 
     #### Params:
-    - tests (list[str]): Full list of tests
-    - failed_tests (list[str]): Names of the tests that failed
+    - tests (list[str]): Full list of tests.
+    - failed_tests (list[str]): Names of the tests that failed.
 
     #### Returns:
-    - (dict[str, list[str]]): Tests grouped by origin file
+    - (dict[str, list[str]]): Tests grouped by origin file.
     """
     passed_name = "passed"
     failed_name = "failed"
@@ -158,13 +160,13 @@ def __get_sorted_results(
 
 def __group_tests_by_file(tests: List[str]) -> Dict[str, List[str]]:
     """
-    ### Groups tests by origin file
+    ### Groups tests by origin file.
 
     #### Params:
-    - tests (list[str]): Full list of tests
+    - tests (list[str]): Full list of tests.
 
     #### Returns:
-    - (dict[str, list[str]]): Tests grouped by origin file
+    - (dict[str, list[str]]): Tests grouped by origin file.
     """
     grouped_tests = {}
     for test in tests:
@@ -178,15 +180,15 @@ def __remove_skippable_tests(
     tests: List[str], skippable_tests: Dict, no_gpu: bool
 ) -> List[str]:
     """
-    ### Removes all the tests that apply from the full test list
+    ### Removes all the tests that apply from the full test list.
 
     #### Params:
-    - tests (list[str]): Full list of tests
-    - skippable_tests (dict): Dictionary containing the different types of skippable tests
-    - no_gpu (bool): If True, GPU-based tests must be removed
+    - tests (list[str]): Full list of tests.
+    - skippable_tests (dict): Dictionary containing the different types of skippable tests.
+    - no_gpu (bool): If True, GPU-based tests must be removed.
 
     #### Returns:
-    - (list[str]): List of tests where skippable ones are removed if applicable
+    - (list[str]): List of tests where skippable ones are removed if applicable.
     """
     tests = __remove_gpu_tests(
         tests, skippable_tests.get(test_data_keys.SKIPPABLE_GPU_KEY, []), no_gpu
@@ -203,15 +205,15 @@ def __remove_gpu_tests(
     tests: List[str], gpu_tests: List[str], no_gpu: bool
 ) -> List[str]:
     """
-    ### Removes the GPU-based tests from the test list if applicable
+    ### Removes the GPU-based tests from the test list if applicable.
 
     #### Params:
-    - tests (list[str]): Full list of tests
-    - gpu_tests (list[str]): List of GPU-base tests
-    - no_gpu (bool): If True, GPU-based tests must be removed
+    - tests (list[str]): Full list of tests.
+    - gpu_tests (list[str]): List of GPU-base tests.
+    - no_gpu (bool): If True, GPU-based tests must be removed.
 
     #### Returns:
-    - (list[str]): List of tests where GPU-based ones are removed if applicable
+    - (list[str]): List of tests where GPU-based ones are removed if applicable.
     """
     if not no_gpu:
         return tests
@@ -226,14 +228,14 @@ def __remove_dependency_tests(
     tests: List[str], dependency_tests: List[Dict]
 ) -> List[str]:
     """
-    ### Removes all dependency-based tests from the test list if the dependency is not met
+    ### Removes all dependency-based tests from the test list if the dependency is not met.
 
     #### Params:
-    - tests (list[str]): Full list of tests
-    - dependency_tests (list[dict]): List of dependency-based tests
+    - tests (list[str]): Full list of tests.
+    - dependency_tests (list[dict]): List of dependency-based tests.
 
     #### Returns:
-    - (list[str]): List of tests where dependency-based ones are removed if applicable
+    - (list[str]): List of tests where dependency-based ones are removed if applicable.
     """
     for dependency in dependency_tests:
         plugin_name = dependency.get(test_data_keys.SKIPPABLE_DEPENDENCIES_NAME_KEY)
@@ -256,14 +258,14 @@ def __remove_dependency_tests(
 
 def __remove_other_tests(tests: List[str], other_tests: List[Dict]) -> List[str]:
     """
-    ### Removes other tests from the test list
+    ### Removes other tests from the test list.
 
     #### Params:
-    - tests (list[str]): Full list of tests
-    - other_tests (list[dict]): List of other tests
+    - tests (list[str]): Full list of tests.
+    - other_tests (list[dict]): List of other tests.
 
     #### Returns:
-    - (list[str]): List of tests where other tests have been removed
+    - (list[str]): List of tests where other tests have been removed.
     """
     for other_test in other_tests:
         test_name = other_test.get(test_data_keys.SKIPPABLE_OTHERS_TEST_KEY)
@@ -278,15 +280,15 @@ def __remove_unmet_internal_dependency_tests(
     tests: List[str], tests_with_deps: Dict[str, List[str]]
 ) -> Tuple[List[str], Dict[str, List[str]]]:
     """
-    ### Removes all the tests that have unmet dependencies
+    ### Removes all the tests that have unmet dependencies.
 
     #### Params:
-    - tests (list[str]): Full list of tests
-    - tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies
+    - tests (list[str]): Full list of tests.
+    - tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies.
 
     #### Returns:
-    - (list[str]): All remaining tests
-    - (dict[str, list[str]]): Remaining tests with their met dependencies
+    - (list[str]): All remaining tests.
+    - (dict[str, list[str]]): Remaining tests with their met dependencies.
     """
     has_been_modified = False
     for test, deps in list(tests_with_deps.items()):
@@ -315,15 +317,15 @@ def __remove_circular_dependencies(
     tests: List[str], tests_with_deps: Dict[str, List[str]]
 ) -> Tuple[List[str], Dict[str, List[str]]]:
     """
-    ### Removes all the tests that are within a circular dependency
+    ### Removes all the tests that are within a circular dependency.
 
     #### Params:
-    - tests (list[str]): Full list of tests
-    - tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies
+    - tests (list[str]): Full list of tests.
+    - tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies.
 
     #### Returns:
-    - (list[str]): All remaining tests
-    - (dict[str, list[str]]): Remaining tests without circular dependencies
+    - (list[str]): All remaining tests.
+    - (dict[str, list[str]]): Remaining tests without circular dependencies.
     """
     non_circular = {}
     while tests_with_deps:
@@ -343,16 +345,16 @@ def __remove_circular_dependency(
     tests: List[str], tests_with_deps: Dict[str, List[str]], circular_path: List[str]
 ) -> Tuple[List[str], Dict[str, List[str]]]:
     """
-    ### Removes all the tests that are within the given circular dependency
+    ### Removes all the tests that are within the given circular dependency.
 
     #### Params:
-    - tests (list[str]): Full list of tests
-    - tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies
-    - circular_path (list[str]): List of tests that form the circular dependency
+    - tests (list[str]): Full list of tests.
+    - tests_with_deps (dict[str, list[str]]): Dictionary containing tests with their dependencies.
+    - circular_path (list[str]): List of tests that form the circular dependency.
 
     #### Returns:
-    - (list[str]): All remaining tests
-    - (dict[str, list[str]]): Remaining tests without circular dependencies
+    - (list[str]): All remaining tests.
+    - (dict[str, list[str]]): Remaining tests without circular dependencies.
     """
     for _ in range(len(circular_path) - 1):
         test_name = circular_path[0]
@@ -370,21 +372,21 @@ def __remove_circular_dependency(
 ############################ LOG FUNCTIONS ############################
 def __log_skip_gpu_test(test_name: str):
     """
-    ### Logs the removal of a GPU-based test
+    ### Logs the removal of a GPU-based test.
 
     #### Params:
-    - test_name (str): Name of the test to skip
+    - test_name (str): Name of the test to skip.
     """
     __log_skip_test(test_name, "Needs GPU")
 
 
 def __log_skip_dependency_test(test_name: str, dependency: str, is_plugin: bool = True):
     """
-    ### Logs the removal of a dependency-based test
+    ### Logs the removal of a dependency-based test.
 
     #### Params:
-    - test_name (str): Name of the test to skip
-    - dependency (str): Name of the plugin or module the test deppends on
+    - test_name (str): Name of the test to skip.
+    - dependency (str): Name of the plugin or module the test deppends on.
     - is_plugin (bool): If True, the package is a plugin. Otherwise, is a regular python package.
     """
     package_type = "plugin" if is_plugin else "package"
@@ -394,11 +396,11 @@ def __log_skip_dependency_test(test_name: str, dependency: str, is_plugin: bool 
 
 def __log_skip_test(test_name: str, custom_text: str):
     """
-    ### Logs the removal of a test
+    ### Logs the removal of a test.
 
     #### Params:
-    - test_name (str): Name of the test to skip
-    - custom_text (str): Custom reason why the test is being skipped
+    - test_name (str): Name of the test to skip.
+    - custom_text (str): Custom reason why the test is being skipped.
     """
     reason_text = f"Reason: {custom_text}" if custom_text else "No reason provided"
     logger.log_warning(f"Skipping test {test_name}. {reason_text}.")
@@ -406,10 +408,10 @@ def __log_skip_test(test_name: str, custom_text: str):
 
 def __log_result_summary(results: Dict[str, List[str]]):
     """
-    ### Logs the result summary
+    ### Logs the result summary.
 
     #### Params:
-    - results (dict[str, list[str]]): Test results grouped by origin file and exit status
+    - results (dict[str, list[str]]): Test results grouped by origin file and exit status.
     """
     logger("SUMMARY:")
     for origin_file in results:

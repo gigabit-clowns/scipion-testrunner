@@ -1,3 +1,5 @@
+"""### Command Line Interface that interacts with the test runner."""
+
 import argparse
 import multiprocessing
 import os
@@ -8,10 +10,10 @@ from scipion_testrunner.domain import test_service
 
 def __generate_parser() -> argparse.ArgumentParser:
     """
-    ### Generates an argument parser for the test runner
+    ### Generates an argument parser for the test runner.
 
     #### Returns:
-    - (ArgumentParser): Argument parser
+    - (ArgumentParser): Argument parser.
     """
     epilog = "Example 1: python -m scipion-testrunner /path/to/scipion myModule -j 2"
     epilog += f"\nExample 2: python -m scipion-testrunner /path/to/scipion myModule --{test_service.NO_GPU_PARAM_NAME}"
@@ -24,13 +26,13 @@ def __generate_parser() -> argparse.ArgumentParser:
 
 def __add_params(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     """
-    ### Inserts the params into the given parser
+    ### Inserts the params into the given parser.
 
     #### Params:
-    - parser (ArgumentParser): Argument parser
+    - parser (ArgumentParser): Argument parser.
 
     #### Returns:
-    - (ArgumentParser): Argument parser with inserted params
+    - (ArgumentParser): Argument parser with inserted params.
     """
     parser.add_argument(
         test_service.SCIPION_PARAM_NAME,
@@ -61,13 +63,13 @@ def __add_params(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
 
 def __get_args_from_parser(parser: argparse.ArgumentParser) -> Dict:
     """
-    ### Extracts the appropiate values from the given parser
+    ### Extracts the appropiate values from the given parser.
 
     #### Params:
-    - parser (ArgumentParser): Argument parser
+    - parser (ArgumentParser): Argument parser.
 
     #### Returns:
-    - (Namespace): Argument's object
+    - (Namespace): Argument's object.
     """
     args = vars(parser.parse_args())
     if args[test_service.TEST_DATA_PARAM_NAME]:
@@ -78,6 +80,7 @@ def __get_args_from_parser(parser: argparse.ArgumentParser) -> Dict:
 
 
 def main():
+    """### Main entry point function that starts the execution."""
     parser = __generate_parser()
     parser = __add_params(parser)
     args = __get_args_from_parser(parser)

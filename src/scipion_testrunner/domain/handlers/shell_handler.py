@@ -1,3 +1,5 @@
+"""### Functions that interact with the shell."""
+
 import os
 from subprocess import Popen, PIPE
 from typing import Tuple
