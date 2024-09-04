@@ -9,3 +9,6 @@ To install this package, activate the enviroment that contains Scipion, and run 
 
 ## Usage
 To view the usage guide, run `scipion_testrunner -h`.
+
+## Documentation
+All the documentation regarding this proyect can be found in the [Wiki](https://github.com/gigabit-clowns/scipion-testrunner/wiki).
