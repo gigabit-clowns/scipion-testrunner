@@ -107,9 +107,9 @@ def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]
     tests = []
     leading_chars = __get_full_test_leading_chars(plugin_module)
     for line in lines:
-        line = line.lstrip()
-        if __is_test_line(line, plugin_module):
-            tests.append(line.replace(leading_chars, ""))
+        stripped_line = line.lstrip()
+        if __is_test_line(stripped_line, plugin_module):
+            tests.append(stripped_line.replace(leading_chars, ""))
     return tests
 
 
@@ -186,8 +186,7 @@ def __download_dataset(dataset: str, scipion: str) -> Optional[str]:
             )
         )
         return dataset
-    else:
-        logger(logger.green(f"Dataset {dataset} download OK"))
+    logger(logger.green(f"Dataset {dataset} download OK"))
 
 
 def __run_test_batch(
@@ -239,8 +238,7 @@ def __run_test(test: str, scipion: str, plugin_module: str) -> Optional[str]:
     if ret_code:
         logger(logger.red(f"{output}\nTest {test} failed with above message."))
         return test
-    else:
-        logger(logger.green(f"Test {test} OK"))
+    logger(logger.green(f"Test {test} OK"))
 
 
 def __get_test_prefix(plugin_module: str):
