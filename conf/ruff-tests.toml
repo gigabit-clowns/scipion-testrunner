@@ -1,0 +1,13 @@
+target-version = "py38"
+
+include = [
+  "tests/**/*.py"
+]
+
+[lint]
+extend-select = [
+  "UP",  # pyupgrade
+]
+
+[lint.pydocstyle]
+convention = "pep257"
