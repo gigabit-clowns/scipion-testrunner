@@ -6,13 +6,12 @@ import sys
 class Logger:
     """### Logger class for keeping track of messages."""
 
-    __BOLD = "\033[1m"
     __BLUE = "\033[34m"
     __RED = "\033[91m"
     __GREEN = "\033[92m"
     __YELLOW = "\033[93m"
     __END_FORMAT = "\033[0m"
-    __FORMATTING_CHARACTERS = [__BOLD, __BLUE, __RED, __GREEN, __YELLOW, __END_FORMAT]
+    __FORMATTING_CHARACTERS = [__BLUE, __RED, __GREEN, __YELLOW, __END_FORMAT]
 
     def __call__(self, text: str):
         """

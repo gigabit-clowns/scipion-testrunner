@@ -9,7 +9,6 @@ __GREEN = "<GREEN>"
 __YELLOW = "<YELLOW>"
 __RED = "<RED>"
 __BLUE = "<BLUE>"
-__BOLD = "<BOLD>"
 __END_FORMAT = "<END_FORMAT>"
 
 
