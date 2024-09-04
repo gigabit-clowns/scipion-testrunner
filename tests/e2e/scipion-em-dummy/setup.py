@@ -6,18 +6,18 @@ https://github.com/pypa/sampleproject
 """
 
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
-from codecs import open
+import codecs
 from os import path
+from setuptools import setup, find_packages
 from dummy import __version__
 
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, "README.rst"), encoding="utf-8") as f:
+with codecs.open(path.join(here, "README.rst"), encoding="utf-8") as f:
     long_description = f.read()
 
-with open("requirements.txt") as f:
+with codecs.open("requirements.txt") as f:
     requirements = f.read().splitlines()
 
 # Arguments marked as "Required" below must be included for upload to PyPI.

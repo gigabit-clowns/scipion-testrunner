@@ -11,5 +11,3 @@ class Plugin(pwem.Plugin):
     """
     Dummy plugin class
     """
-
-    pass
