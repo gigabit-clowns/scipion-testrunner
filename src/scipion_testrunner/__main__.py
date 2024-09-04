@@ -1,3 +1,5 @@
+"""### System's entry point."""
+
 from scipion_testrunner.application.cli import main
 
 if __name__ == "__main__":

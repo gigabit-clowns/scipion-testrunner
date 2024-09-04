@@ -1,14 +1,10 @@
-"""
-Provides a global logger.
-"""
+"""Provides a global logger."""
 
 import sys
 
 
 class Logger:
-    """
-    ### Logger class for keeping track of messages.
-    """
+    """### Logger class for keeping track of messages."""
 
     __BOLD = "\033[1m"
     __BLUE = "\033[34m"
@@ -19,9 +15,7 @@ class Logger:
     __FORMATTING_CHARACTERS = [__BOLD, __BLUE, __RED, __GREEN, __YELLOW, __END_FORMAT]
 
     def __init__(self):
-        """
-        ### Constructor.
-        """
+        """### Constructor."""
         self.__log_file = None
 
     def start_log_file(self, log_path: str):

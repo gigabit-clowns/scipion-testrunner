@@ -1,3 +1,5 @@
+"""### Functions to interact with the configuration JSON file."""
+
 import json
 from typing import Tuple, List, Dict
 
@@ -7,16 +9,14 @@ from scipion_testrunner.configuration import test_data_keys
 
 def get_test_config(file_path: str) -> Tuple[List[str], Dict, Dict]:
     """
-    ### Returns a list with the necessary datasets for the tests, as well as
-    ### an object with the different tests, the situations where to skip them,
-    ### and the dependencies between tests.
+    ### Returns a list with the necessary datasets for the tests, as well as an object with the different tests, the situations where to skip them, and the dependencies between tests.
 
     #### Params:
     - file_path (str): Path to the test data json file.
 
     #### Returns:
     - (tuple[list[str], dict, dict]): Tuple containing the list of
-    datasets to download, skippable tests, and dependencies between tests
+    datasets to download, skippable tests, and dependencies between tests.
     """
     if not file_path:
         logger(logger.yellow("No skippable tests file provided, running all."))
