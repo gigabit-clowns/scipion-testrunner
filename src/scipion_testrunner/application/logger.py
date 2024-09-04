@@ -14,19 +14,6 @@ class Logger:
     __END_FORMAT = "\033[0m"
     __FORMATTING_CHARACTERS = [__BOLD, __BLUE, __RED, __GREEN, __YELLOW, __END_FORMAT]
 
-    def __init__(self):
-        """### Constructor."""
-        self.__log_file = None
-
-    def start_log_file(self, log_path: str):
-        """
-        ### Initiates the log file.
-
-        #### Params:
-        - log_path (str): Path to the log file.
-        """
-        self.__log_file = open(log_path, "w")
-
     def __call__(self, text: str):
         """
         ### Log a message.
@@ -35,8 +22,6 @@ class Logger:
         - text (str): Message to be logged. Supports fancy formatting.
         """
         print(text, flush=True)
-        if self.__log_file is not None:
-            print(self.__remove_non_printable(text), file=self.__log_file, flush=True)
 
     def log_warning(self, text: str):
         """
@@ -45,7 +30,7 @@ class Logger:
         #### Params:
         - text (str): Warning message to show.
         """
-        self.__call__(self.yellow(self.__remove_non_printable(text)))
+        self(self.yellow(self.__remove_non_printable(text)))
 
     def log_error(self, text: str, ret_code: int = 1):
         """
@@ -55,7 +40,7 @@ class Logger:
         - text (str): Error message to show.
         - ret_code (int): Optional. Return code to end the exection with.
         """
-        self.__call__(self.red(self.__remove_non_printable(text)))
+        self(self.red(self.__remove_non_printable(text)))
         sys.exit(ret_code)
 
     def green(self, text: str) -> str:
@@ -105,18 +90,6 @@ class Logger:
         - (str): Text formatted in blue color.
         """
         return self.__format_text(text, self.__BLUE)
-
-    def bold(self, text: str) -> str:
-        """
-        ### Returns the given text formatted in bold.
-
-        #### Params:
-        - text (str): Text to format.
-
-        #### Returns:
-        - (str): Text formatted in bold.
-        """
-        return self.__format_text(text, self.__BOLD)
 
     def __format_text(self, text: str, format_code: str) -> str:
         """
