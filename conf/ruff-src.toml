@@ -5,9 +5,13 @@ include = [
 ]
 
 [lint]
+preview = true
 extend-select = [
   "UP",  # pyupgrade
   "D",   # pydocstyle
+  "PLW", # pylint warning
+  "PLC", # pylint convention
+  "PLR", # pylint refactor
 ]
 
 [lint.pydocstyle]
