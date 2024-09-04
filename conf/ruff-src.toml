@@ -9,9 +9,7 @@ preview = true
 extend-select = [
   "UP",  # pyupgrade
   "D",   # pydocstyle
-  "PLW", # pylint warning
-  "PLC", # pylint convention
-  "PLR", # pylint refactor
+  "PL",  # pylint
 ]
 
 [lint.pydocstyle]
