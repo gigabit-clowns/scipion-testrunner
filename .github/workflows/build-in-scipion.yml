@@ -51,4 +51,4 @@ jobs:
         env:
           TEST_MODULE: dummy
         working-directory: ${{ github.workspace }}/../
-        run: scipion_testrunner ./scipion/scipion3 $TEST_MODULE --noGpu --testData=${{ github.workspace }}/tests/e2e/scipion-em-$TEST_MODULE/$TEST_MODULE/testData.json
+        run: ${{ vars.MODULE_NAME }} ./scipion/scipion3 $TEST_MODULE --noGpu --testData=${{ github.workspace }}/tests/e2e/scipion-em-$TEST_MODULE/$TEST_MODULE/testData.json
