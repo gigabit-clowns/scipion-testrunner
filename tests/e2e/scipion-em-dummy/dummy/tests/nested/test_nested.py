@@ -5,6 +5,7 @@ from ..test_base import TestBase
 
 class TestNested(TestBase):
     """Test in nested folder."""
+
     def test_true(self):
         """Test with input param True"""
         self.assertTrue(self._run_dummy(True))

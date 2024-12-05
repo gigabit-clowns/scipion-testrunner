@@ -7,6 +7,7 @@ from ..protocols import ProtDummy
 
 class TestBase(BaseTest):
     """Test template."""
+
     @classmethod
     def setUpClass(cls):
         """Configuration of the test project."""
