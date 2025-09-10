@@ -30,7 +30,7 @@ jobs:
 
       - name: Install project
         working-directory: ${{ github.workspace }}
-        run: pip install -e .
+        run: pip install -e .[test]
 
       - name: Use CLI standalone
         run: ${{ vars.MODULE_NAME }} -h
