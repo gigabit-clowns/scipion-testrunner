@@ -163,7 +163,7 @@ def __is_test_line(line: str, plugin_module: str) -> bool:
     """
     if not line.startswith(__get_full_test_leading_chars(plugin_module)):
         return False
-    test_class = line.split(".")[-1]
+    test_class = line.rsplit(".", maxsplit=1)[-1]
     return test_class.startswith("Test")
 
 
