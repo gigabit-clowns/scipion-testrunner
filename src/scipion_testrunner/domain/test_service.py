@@ -291,7 +291,7 @@ def __remove_unmet_internal_dependency_tests(
     - (dict[str, list[str]]): Remaining tests with their met dependencies.
     """
     has_been_modified = False
-    for test, deps in tests_with_deps.items():
+    for test, deps in tests_with_deps.copy().items():
         non_met_deps = [
             element for element in deps if element in list(set(deps) - set(tests))
         ]
