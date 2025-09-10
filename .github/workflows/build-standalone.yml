@@ -43,7 +43,7 @@ jobs:
           SCRIPT_PATH: ./scripts/run-tests.sh
         run: |
           chmod +x $SCRIPT_PATH
-          python -m $SCRIPT_PATH
+          $SCRIPT_PATH
       
       - name: Check source code with Ruff
         run: python -m ruff check --config ./conf/ruff-src.toml
