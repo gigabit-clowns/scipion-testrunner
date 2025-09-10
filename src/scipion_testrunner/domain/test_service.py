@@ -125,7 +125,7 @@ def __get_test_batch(test_with_deps: Dict[str, List[str]]) -> List[str]:
     - (list[str]): Next test batch to run.
     """
     batch = []
-    for test, deps in list(test_with_deps.items()):
+    for test, deps in test_with_deps.items():
         if not any(key in deps for key in test_with_deps.keys()):
             batch.append(test)
     return batch
@@ -291,7 +291,7 @@ def __remove_unmet_internal_dependency_tests(
     - (dict[str, list[str]]): Remaining tests with their met dependencies.
     """
     has_been_modified = False
-    for test, deps in list(tests_with_deps.items()):
+    for test, deps in tests_with_deps.copy().items():
         non_met_deps = [
             element for element in deps if element in list(set(deps) - set(tests))
         ]
