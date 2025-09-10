@@ -6,7 +6,10 @@ authors = [
 ]
 description = "Module to handle in an efficient way the execution of Scipion tests"
 keywords = ["scipion", "testing"]
-classifiers = ["Programming Language :: Python"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: 5 - Production/Stable"
+]
 readme = "README.md"
 license = { "file" = "LICENSE" }
 

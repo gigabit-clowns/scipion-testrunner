@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scipion-em-dummy"
+version = "1.0.0"
+authors = [ 
+	{ name = "Martín Salinas", email = "ssalinasmartin@gmail.com" }
+]
+description = "Dummy Scipion plugin in order to perform E2E testing"
+keywords = ["scipion", "E2E"]
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"Development Status :: 5 - Production/Stable"
+]
+
+requires-python = ">=3.8"
+dependencies = [
+  "scipion-em",
+  "scipion-pyworkflow"
+]
+
+[project.optional-dependencies]
+test = [
+	"pytest==8.*",
+	"pytest-cov==5.*; python_version < '3.9'",
+	"pytest-cov==6.*; python_version > '3.8'",
+	"ruff==0.*"
+]
+
+[project.entry-points."pyworkflow.plugin"]
+dummy = "dummy"
+
+[tool.setuptools.package-data]
+dummy = ["protocols.conf"]
