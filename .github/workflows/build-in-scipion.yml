@@ -14,12 +14,6 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Enable Pull Request Automerge
-        if: github.event_name == 'pull_request'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --squash --auto "${{ github.event.number }}"  
-
       - name: Install Miniconda  
         uses: conda-incubator/setup-miniconda@v3
         with:
