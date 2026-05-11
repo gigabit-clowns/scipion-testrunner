@@ -1,7 +1,9 @@
 """### Functions that interact with Python via shell."""
 
+from __future__ import annotations
+
 import multiprocessing
-from typing import Callable, List
+from typing import Callable
 
 from scipion_testrunner.domain.handlers import shell_handler
 
@@ -35,9 +37,9 @@ def python_command_succeeded(command: str) -> bool:
 def run_function_in_parallel(
     func: Callable,
     *args,
-    parallelizable_params: List[str],
+    parallelizable_params: list[str],
     jobs: int = multiprocessing.cpu_count(),
-) -> List:
+) -> list:
     """
     ### Runs the given Python function in parallel.
 

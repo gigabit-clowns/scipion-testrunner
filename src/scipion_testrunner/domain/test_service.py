@@ -1,13 +1,12 @@
 """### Performs the main high-level steps of the workflow required to test a plugin."""
 
-import sys
-from typing import Dict, List, Tuple
+from __future__ import annotations
 
-from scipion_testrunner.configuration import test_config
+import sys
 
 from scipion_testrunner.application.logger import logger
+from scipion_testrunner.configuration import test_config, test_data_keys
 from scipion_testrunner.domain.handlers import python_handler, scipion_handler
-from scipion_testrunner.configuration import test_data_keys
 
 SCIPION_PARAM_NAME = "scipion"
 PLUGIN_PARAM_NAME = "plugin"
@@ -16,7 +15,7 @@ NO_GPU_PARAM_NAME = "noGpu"
 TEST_DATA_PARAM_NAME = "testData"
 
 
-def test_scipion_plugin(args: Dict):
+def test_scipion_plugin(args: dict):
     """
     ### Handles the full test execution of a Scipion plugin.
 
@@ -59,8 +58,8 @@ def test_scipion_plugin(args: Dict):
 
 
 def __find_circular_dependency(
-    test_name: str, tests_with_deps: Dict[str, List[str]], path: List[str] = None
-) -> List[str]:
+    test_name: str, tests_with_deps: dict[str, list[str]], path: list[str] | None = None
+) -> list[str]:
     """
     ### Returns a list of all the tests involved in a circular dependency path.
 
@@ -88,8 +87,8 @@ def __find_circular_dependency(
 
 
 def __generate_sorted_test_batches(
-    tests: List[str], tests_with_deps: Dict[str, List[str]]
-) -> Tuple[List[str], List[List[str]]]:
+    tests: list[str], tests_with_deps: dict[str, list[str]]
+) -> tuple[list[str], list[list[str]]]:
     """
     ### Generates the list of test batches to be executed in order.
 
@@ -114,7 +113,7 @@ def __generate_sorted_test_batches(
     return tests, test_batches
 
 
-def __get_test_batch(test_with_deps: Dict[str, List[str]]) -> List[str]:
+def __get_test_batch(test_with_deps: dict[str, list[str]]) -> list[str]:
     """
     ### Returns the next test batch to run given the dependencies between them.
 
@@ -126,14 +125,14 @@ def __get_test_batch(test_with_deps: Dict[str, List[str]]) -> List[str]:
     """
     batch = []
     for test, deps in test_with_deps.items():
-        if not any(key in deps for key in test_with_deps.keys()):
+        if not any(key in deps for key in test_with_deps):
             batch.append(test)
     return batch
 
 
 def __get_sorted_results(
-    tests: List[str], failed_tests: List[str]
-) -> Dict[str, List[str]]:
+    tests: list[str], failed_tests: list[str]
+) -> dict[str, list[str]]:
     """
     ### Groups the passed/failed test results by origin file.
 
@@ -158,7 +157,7 @@ def __get_sorted_results(
     return results
 
 
-def __group_tests_by_file(tests: List[str]) -> Dict[str, List[str]]:
+def __group_tests_by_file(tests: list[str]) -> dict[str, list[str]]:
     """
     ### Groups tests by origin file.
 
@@ -177,8 +176,8 @@ def __group_tests_by_file(tests: List[str]) -> Dict[str, List[str]]:
 
 ############################ REMOVAL FUNCTIONS ############################
 def __remove_skippable_tests(
-    tests: List[str], skippable_tests: Dict, no_gpu: bool
-) -> List[str]:
+    tests: list[str], skippable_tests: dict, no_gpu: bool
+) -> list[str]:
     """
     ### Removes all the tests that apply from the full test list.
 
@@ -202,8 +201,8 @@ def __remove_skippable_tests(
 
 
 def __remove_gpu_tests(
-    tests: List[str], gpu_tests: List[str], no_gpu: bool
-) -> List[str]:
+    tests: list[str], gpu_tests: list[str], no_gpu: bool
+) -> list[str]:
     """
     ### Removes the GPU-based tests from the test list if applicable.
 
@@ -225,8 +224,8 @@ def __remove_gpu_tests(
 
 
 def __remove_dependency_tests(
-    tests: List[str], dependency_tests: List[Dict]
-) -> List[str]:
+    tests: list[str], dependency_tests: list[dict]
+) -> list[str]:
     """
     ### Removes all dependency-based tests from the test list if the dependency is not met.
 
@@ -256,7 +255,7 @@ def __remove_dependency_tests(
     return tests
 
 
-def __remove_other_tests(tests: List[str], other_tests: List[Dict]) -> List[str]:
+def __remove_other_tests(tests: list[str], other_tests: list[dict]) -> list[str]:
     """
     ### Removes other tests from the test list.
 
@@ -277,8 +276,8 @@ def __remove_other_tests(tests: List[str], other_tests: List[Dict]) -> List[str]
 
 
 def __remove_unmet_internal_dependency_tests(
-    tests: List[str], tests_with_deps: Dict[str, List[str]]
-) -> Tuple[List[str], Dict[str, List[str]]]:
+    tests: list[str], tests_with_deps: dict[str, list[str]]
+) -> tuple[list[str], dict[str, list[str]]]:
     """
     ### Removes all the tests that have unmet dependencies.
 
@@ -314,8 +313,8 @@ def __remove_unmet_internal_dependency_tests(
 
 
 def __remove_circular_dependencies(
-    tests: List[str], tests_with_deps: Dict[str, List[str]]
-) -> Tuple[List[str], Dict[str, List[str]]]:
+    tests: list[str], tests_with_deps: dict[str, list[str]]
+) -> tuple[list[str], dict[str, list[str]]]:
     """
     ### Removes all the tests that are within a circular dependency.
 
@@ -329,7 +328,7 @@ def __remove_circular_dependencies(
     """
     non_circular = {}
     while tests_with_deps:
-        test_name = list(tests_with_deps.keys())[0]
+        test_name = next(iter(tests_with_deps))
         circular_path = __find_circular_dependency(test_name, tests_with_deps)
         if not circular_path:
             non_circular[test_name] = tests_with_deps[test_name]
@@ -342,8 +341,8 @@ def __remove_circular_dependencies(
 
 
 def __remove_circular_dependency(
-    tests: List[str], tests_with_deps: Dict[str, List[str]], circular_path: List[str]
-) -> Tuple[List[str], Dict[str, List[str]]]:
+    tests: list[str], tests_with_deps: dict[str, list[str]], circular_path: list[str]
+) -> tuple[list[str], dict[str, list[str]]]:
     """
     ### Removes all the tests that are within the given circular dependency.
 
@@ -406,7 +405,7 @@ def __log_skip_test(test_name: str, custom_text: str):
     logger.log_warning(f"Skipping test {test_name}. {reason_text}.")
 
 
-def __log_result_summary(results: Dict[str, List[str]]):
+def __log_result_summary(results: dict[str, list[str]]):
     """
     ### Logs the result summary.
 

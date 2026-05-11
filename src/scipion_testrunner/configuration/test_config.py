@@ -1,13 +1,14 @@
 """### Functions to interact with the configuration JSON file."""
 
+from __future__ import annotations
+
 import json
-from typing import Tuple, List, Dict
 
 from scipion_testrunner.application.logger import logger
 from scipion_testrunner.configuration import test_data_keys
 
 
-def get_test_config(file_path: str) -> Tuple[List[str], Dict, Dict]:
+def get_test_config(file_path: str) -> tuple[list[str], dict, dict]:
     """
     ### Returns a list with the necessary datasets for the tests, as well as an object with the different tests, the situations where to skip them, and the dependencies between tests.
 
@@ -37,5 +38,5 @@ def get_test_config(file_path: str) -> Tuple[List[str], Dict, Dict]:
         logger.log_error(f"ERROR: Permission denied to open file '{file_path}'.")
     except json.JSONDecodeError as e:
         logger.log_error(f"ERROR: Invalid JSON format in file '{file_path}':\n{e}")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         logger.log_error(f"An unexpected error occurred:\n{e}")

@@ -1,7 +1,8 @@
 """### Functions that interact with Scipion."""
 
+from __future__ import annotations
+
 import multiprocessing
-from typing import List, Optional
 
 from scipion_testrunner.application.logger import logger
 from scipion_testrunner.domain.handlers import python_handler, shell_handler
@@ -36,7 +37,7 @@ def get_all_tests(scipion: str, plugin_module: str):
     return test_list
 
 
-def download_datasets(scipion: str, datasets: List[str]):
+def download_datasets(scipion: str, datasets: list[str]):
     """
     ### Downloads the given list of datasets.
 
@@ -59,11 +60,11 @@ def download_datasets(scipion: str, datasets: List[str]):
 
 def run_tests(
     scipion: str,
-    tests: List[str],
-    test_batches: List[List[str]],
+    tests: list[str],
+    test_batches: list[list[str]],
     max_jobs: int,
     plugin_module: str,
-) -> List[str]:
+) -> list[str]:
     """
     ### Runs the given tests and returns the name of the failed ones.
 
@@ -92,7 +93,7 @@ def run_tests(
     return failed_tests
 
 
-def __get_test_list_from_str(command_text: str, plugin_module: str) -> List[str]:
+def __get_test_list_from_str(command_text: str, plugin_module: str) -> list[str]:
     """
     ### Return the list of tests given a command text.
 
@@ -167,7 +168,7 @@ def __is_test_line(line: str, plugin_module: str) -> bool:
     return test_class.startswith("Test")
 
 
-def __download_dataset(dataset: str, scipion: str) -> Optional[str]:
+def __download_dataset(dataset: str, scipion: str) -> str | None:
     """
     ### Downloads the given dataset.
 
@@ -187,11 +188,12 @@ def __download_dataset(dataset: str, scipion: str) -> Optional[str]:
         )
         return dataset
     logger(logger.green(f"Dataset {dataset} download OK"))
+    return None
 
 
 def __run_test_batch(
-    tests: List[str], max_jobs: int, scipion: str, plugin_module: str
-) -> List[str]:
+    tests: list[str], max_jobs: int, scipion: str, plugin_module: str
+) -> list[str]:
     """
     ### Runs the given test batch.
 
@@ -205,7 +207,7 @@ def __run_test_batch(
     - (list[str]): Tests that failed.
     """
     batch_size = len(tests)
-    jobs = batch_size if batch_size < max_jobs else max_jobs
+    jobs = min(max_jobs, batch_size)
     test_number_text = f"test{'s' if batch_size > 1 else ''}"
     jobs_text = f"process{'es' if jobs > 1 else ''}"
     batch_text = f" in batches of {jobs} {jobs_text}" if batch_size > 1 else ""
@@ -219,7 +221,7 @@ def __run_test_batch(
     )
 
 
-def __run_test(test: str, scipion: str, plugin_module: str) -> Optional[str]:
+def __run_test(test: str, scipion: str, plugin_module: str) -> str | None:
     """
     ### Runs a given test.
 
@@ -239,6 +241,7 @@ def __run_test(test: str, scipion: str, plugin_module: str) -> Optional[str]:
         logger(logger.red(f"{output}\nTest {test} failed with above message."))
         return test
     logger(logger.green(f"Test {test} OK"))
+    return None
 
 
 def __get_test_prefix(plugin_module: str):

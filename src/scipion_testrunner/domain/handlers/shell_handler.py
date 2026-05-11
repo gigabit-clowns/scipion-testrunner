@@ -1,11 +1,12 @@
 """### Functions that interact with the shell."""
 
-import subprocess
+from __future__ import annotations
+
 import os
-from typing import Tuple
+import subprocess
 
 
-def run_shell_command(cmd: str) -> Tuple[int, str]:
+def run_shell_command(cmd: str) -> tuple[int, str]:
     """
     ### Runs the given command in a shell.
 
