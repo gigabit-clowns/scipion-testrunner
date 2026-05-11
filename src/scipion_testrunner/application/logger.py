@@ -1,6 +1,9 @@
 """Provides a global logger."""
 
+from __future__ import annotations
+
 import sys
+from typing import ClassVar
 
 
 class Logger:
@@ -11,7 +14,13 @@ class Logger:
     __GREEN = "\033[92m"
     __YELLOW = "\033[93m"
     __END_FORMAT = "\033[0m"
-    __FORMATTING_CHARACTERS = [__BLUE, __RED, __GREEN, __YELLOW, __END_FORMAT]
+    __FORMATTING_CHARACTERS: ClassVar[tuple[str, ...]] = (
+        __BLUE,
+        __RED,
+        __GREEN,
+        __YELLOW,
+        __END_FORMAT,
+    )
 
     def __call__(self, text: str):
         """

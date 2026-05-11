@@ -1,9 +1,9 @@
 """### Command Line Interface that interacts with the test runner."""
+from __future__ import annotations
 
 import argparse
 import multiprocessing
 import os
-from typing import Dict
 
 from scipion_testrunner.domain import test_service
 
@@ -61,7 +61,7 @@ def __add_params(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     return parser
 
 
-def __get_args_from_parser(parser: argparse.ArgumentParser) -> Dict:
+def __get_args_from_parser(parser: argparse.ArgumentParser) -> dict:
     """
     ### Extracts the appropiate values from the given parser.
 
