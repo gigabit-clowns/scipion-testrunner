@@ -188,6 +188,7 @@ def __download_dataset(dataset: str, scipion: str) -> str | None:
         )
         return dataset
     logger(logger.green(f"Dataset {dataset} download OK"))
+    return None
 
 
 def __run_test_batch(
@@ -240,6 +241,7 @@ def __run_test(test: str, scipion: str, plugin_module: str) -> str | None:
         logger(logger.red(f"{output}\nTest {test} failed with above message."))
         return test
     logger(logger.green(f"Test {test} OK"))
+    return None
 
 
 def __get_test_prefix(plugin_module: str):
