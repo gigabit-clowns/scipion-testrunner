@@ -1,8 +1,10 @@
 """Dummy protocol for testing."""
 
+from typing import ClassVar
+
 from pwem.protocols import EMProtocol
+from pyworkflow.protocol import Boolean, params
 from pyworkflow.utils import Message
-from pyworkflow.protocol import params, Boolean
 
 
 class ProtDummy(EMProtocol):
@@ -12,7 +14,7 @@ class ProtDummy(EMProtocol):
 
     _label = "Dummy"
     OUTNAME = "outputStatus"
-    _possibleOutputs = {OUTNAME: bool}
+    _possibleOutputs: ClassVar = {OUTNAME: bool}
 
     def _defineParams(self, form):
         """

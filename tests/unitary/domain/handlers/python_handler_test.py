@@ -1,4 +1,6 @@
-from typing import Callable, Optional, Tuple
+from __future__ import annotations
+
+from typing import Callable
 from unittest.mock import patch
 
 import pytest
@@ -13,9 +15,9 @@ __MODULE_NAME = "test"
     [pytest.param(True, "does not exist"), pytest.param(False, "exists")],
 )
 def test_returns_expected_value_when_checking_if_module_exists(
-    exists, message_fragment, __mock_python_command_succeeded
+    exists, message_fragment, _mock_python_command_succeeded
 ):
-    __mock_python_command_succeeded.return_value = exists
+    _mock_python_command_succeeded.return_value = exists
     assert (
         python_handler.exists_python_module(__MODULE_NAME) == exists
     ), f"Function returns that module {message_fragment}."
@@ -26,9 +28,9 @@ def test_returns_expected_value_when_checking_if_module_exists(
     [pytest.param(0, True, "did not suceed"), pytest.param(1, False, "succeeded")],
 )
 def test_returns_expected_status_when_testing_python_command(
-    return_code, succeeded, message_fragment, __mock_run_shell_command
+    return_code, succeeded, message_fragment, _mock_run_shell_command
 ):
-    __mock_run_shell_command.return_value = return_code, ""
+    _mock_run_shell_command.return_value = return_code, ""
     assert (
         python_handler.python_command_succeeded("test-command") == succeeded
     ), f"Command {message_fragment}."
@@ -44,7 +46,7 @@ def test_returns_expected_status_when_testing_python_command(
     ],
 )
 def test_returns_expected_statuses_when_running_parallel_function(
-    params, n_errors, __mock_pool
+    params, n_errors, _mock_pool
 ):
     params = [(str(param) if param else "") for param in params]
     assert (
@@ -71,7 +73,7 @@ class ExitState:
         """
         self.success = bool(input_str)
 
-    def get(self) -> Optional[str]:
+    def get(self) -> str | None:
         """
         ### Returns a message if the state of the fake operation is failure.
 
@@ -80,6 +82,7 @@ class ExitState:
         """
         if not self.success:
             return "Failed"
+        return None
 
 
 class PoolMock:
@@ -96,13 +99,13 @@ class PoolMock:
         """
         self.processes = processes
 
-    def apply_async(self, func: Callable, args: Tuple):
+    def apply_async(self, func: Callable, args: tuple):
         """
         ### Calls the received callable with given args.
 
         #### Params:
         - func (callable): Callable to run.
-        - args (Tuple): Args to be passed on to the callable.
+        - args (tuple): Args to be passed on to the callable.
 
         #### Returns:
         - (Any): Output of the callable.
@@ -113,17 +116,15 @@ class PoolMock:
         """
         ### Overrides the pool close function.
         """
-        pass
 
     def join(self):
         """
         ### Overrides the pool join function.
         """
-        pass
 
 
 @pytest.fixture
-def __mock_python_command_succeeded():
+def _mock_python_command_succeeded():
     with patch(
         "scipion_testrunner.domain.handlers.python_handler.python_command_succeeded"
     ) as mock_method:
@@ -131,7 +132,7 @@ def __mock_python_command_succeeded():
 
 
 @pytest.fixture
-def __mock_run_shell_command():
+def _mock_run_shell_command():
     with patch(
         "scipion_testrunner.domain.handlers.shell_handler.run_shell_command"
     ) as mock_method:
@@ -139,7 +140,7 @@ def __mock_run_shell_command():
 
 
 @pytest.fixture
-def __mock_pool():
+def _mock_pool():
     with patch("multiprocessing.Pool") as mock_method:
         mock_method.side_effect = PoolMock
         yield mock_method
