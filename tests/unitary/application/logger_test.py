@@ -12,10 +12,10 @@ __BLUE = "<BLUE>"
 __END_FORMAT = "<END_FORMAT>"
 
 
-def test_logger_is_called_with_expected_text_when_logging_to_stdout(__mock_print):
+def test_logger_is_called_with_expected_text_when_logging_to_stdout(_mock_print):
     logger = Logger()
     logger(__TEST_STRING)
-    __mock_print.assert_called_once_with(__TEST_STRING, flush=True)
+    _mock_print.assert_called_once_with(__TEST_STRING, flush=True)
 
 
 @pytest.mark.parametrize(
@@ -28,27 +28,27 @@ def test_logger_is_called_with_expected_text_when_logging_to_stdout(__mock_print
     ],
 )
 def test_logger_is_called_with_expected_formatted_text_when_logging_to_stdout(
-    color_method, __mock_print
+    color_method, _mock_print
 ):
     logger = Logger()
     logger(color_method(logger, __TEST_STRING))
-    __mock_print.assert_called_once_with(
+    _mock_print.assert_called_once_with(
         color_method(logger, __TEST_STRING), flush=True
     )
 
 
-def test_logger_is_called_with_expected_text_when_logging_warning(__mock_print):
+def test_logger_is_called_with_expected_text_when_logging_warning(_mock_print):
     logger = Logger()
     logger.log_warning(__TEST_STRING)
-    __mock_print.assert_called_with(logger.yellow(__TEST_STRING), flush=True)
+    _mock_print.assert_called_with(logger.yellow(__TEST_STRING), flush=True)
 
 
 def test_logger_is_called_with_expected_text_when_logging_error(
-    __mock_print, __mock_exit
+    _mock_print, _mock_exit
 ):
     logger = Logger()
     logger.log_error(__TEST_STRING)
-    __mock_print.assert_called_with(logger.red(__TEST_STRING), flush=True)
+    _mock_print.assert_called_with(logger.red(__TEST_STRING), flush=True)
 
 
 @pytest.mark.parametrize(
@@ -61,7 +61,7 @@ def test_logger_is_called_with_expected_text_when_logging_error(
     ],
 )
 def test_returns_expected_formatted_text(
-    color_method, starting_formatting_character, __mock_logger_format_attributes
+    color_method, starting_formatting_character, _mock_logger_format_attributes
 ):
     logger = Logger()
     assert (
@@ -71,19 +71,19 @@ def test_returns_expected_formatted_text(
 
 
 @pytest.fixture
-def __mock_print():
+def _mock_print():
     with patch("builtins.print") as mock_method:
         yield mock_method
 
 
 @pytest.fixture
-def __mock_exit():
+def _mock_exit():
     with patch("sys.exit") as mock_method:
         yield mock_method
 
 
 @pytest.fixture
-def __mock_logger_format_attributes():
+def _mock_logger_format_attributes():
     with patch.object(Logger, "_Logger__GREEN", __GREEN) as mock_green, patch.object(
         Logger, "_Logger__YELLOW", __YELLOW
     ) as mock_yellow, patch.object(

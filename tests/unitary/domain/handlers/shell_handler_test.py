@@ -9,9 +9,9 @@ from scipion_testrunner.domain.handlers import shell_handler
 __COMMAND = "echo Hi"
 
 
-def test_calls_popen_when_running_shell_command(__mock_popen):
+def test_calls_popen_when_running_shell_command(_mock_popen):
     shell_handler.run_shell_command(__COMMAND)
-    __mock_popen.assert_called_once_with(
+    _mock_popen.assert_called_once_with(
         __COMMAND,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -20,14 +20,14 @@ def test_calls_popen_when_running_shell_command(__mock_popen):
     )
 
 
-def test_calls_popen_wait_when_running_shell_command(__mock_popen):
+def test_calls_popen_wait_when_running_shell_command(_mock_popen):
     shell_handler.run_shell_command(__COMMAND)
-    __mock_popen().wait.assert_called_once_with()
+    _mock_popen().wait.assert_called_once_with()
 
 
-def test_calls_popen_communicate_when_running_shell_command(__mock_popen):
+def test_calls_popen_communicate_when_running_shell_command(_mock_popen):
     shell_handler.run_shell_command(__COMMAND)
-    __mock_popen().communicate.assert_called_once_with()
+    _mock_popen().communicate.assert_called_once_with()
 
 
 def test_returns_expected_ok_return_code_when_running_shell_command():
@@ -63,25 +63,25 @@ def __remove_carriage_characters(text: str) -> str:
 
 
 @pytest.fixture
-def __mock_stdout():
+def _mock_stdout():
     mock_stdout = Mock()
     mock_stdout.read.return_value = b"Hi\n"
     return mock_stdout
 
 
 @pytest.fixture
-def __mock_stderr():
+def _mock_stderr():
     mock_stderr = Mock()
     mock_stderr.read.return_value = b"Error\n"
     return mock_stderr
 
 
 @pytest.fixture
-def __mock_popen(__mock_stdout, __mock_stderr):
+def _mock_popen(_mock_stdout, _mock_stderr):
     with patch("subprocess.Popen") as mock_method:
         mock_process = Mock()
-        mock_process.stdout = __mock_stdout()
-        mock_process.stderr = __mock_stderr()
+        mock_process.stdout = _mock_stdout()
+        mock_process.stderr = _mock_stderr()
         mock_process.wait.return_value = None
         mock_process.communicate.return_value = (0, b"")
 

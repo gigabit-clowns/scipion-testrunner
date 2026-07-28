@@ -13,9 +13,9 @@ __MODULE_NAME = "test"
     [pytest.param(True, "does not exist"), pytest.param(False, "exists")],
 )
 def test_returns_expected_value_when_checking_if_module_exists(
-    exists, message_fragment, __mock_python_command_succeeded
+    exists, message_fragment, _mock_python_command_succeeded
 ):
-    __mock_python_command_succeeded.return_value = exists
+    _mock_python_command_succeeded.return_value = exists
     assert (
         python_handler.exists_python_module(__MODULE_NAME) == exists
     ), f"Function returns that module {message_fragment}."
@@ -26,9 +26,9 @@ def test_returns_expected_value_when_checking_if_module_exists(
     [pytest.param(0, True, "did not suceed"), pytest.param(1, False, "succeeded")],
 )
 def test_returns_expected_status_when_testing_python_command(
-    return_code, succeeded, message_fragment, __mock_run_shell_command
+    return_code, succeeded, message_fragment, _mock_run_shell_command
 ):
-    __mock_run_shell_command.return_value = return_code, ""
+    _mock_run_shell_command.return_value = return_code, ""
     assert (
         python_handler.python_command_succeeded("test-command") == succeeded
     ), f"Command {message_fragment}."
@@ -44,7 +44,7 @@ def test_returns_expected_status_when_testing_python_command(
     ],
 )
 def test_returns_expected_statuses_when_running_parallel_function(
-    params, n_errors, __mock_pool
+    params, n_errors, _mock_pool
 ):
     params = [(str(param) if param else "") for param in params]
     assert (
@@ -123,7 +123,7 @@ class PoolMock:
 
 
 @pytest.fixture
-def __mock_python_command_succeeded():
+def _mock_python_command_succeeded():
     with patch(
         "scipion_testrunner.domain.handlers.python_handler.python_command_succeeded"
     ) as mock_method:
@@ -131,7 +131,7 @@ def __mock_python_command_succeeded():
 
 
 @pytest.fixture
-def __mock_run_shell_command():
+def _mock_run_shell_command():
     with patch(
         "scipion_testrunner.domain.handlers.shell_handler.run_shell_command"
     ) as mock_method:
@@ -139,7 +139,7 @@ def __mock_run_shell_command():
 
 
 @pytest.fixture
-def __mock_pool():
+def _mock_pool():
     with patch("multiprocessing.Pool") as mock_method:
         mock_method.side_effect = PoolMock
         yield mock_method
