@@ -336,7 +336,7 @@ def test_removes_expected_dependency_tests(
         ), "Received different remaining tests than expected."
 
 
-def test_logs_skipping_other_test(__mock_log_skip_test):
+def test_logs_skipping_other_test(_mock_log_skip_test):
     reason = "test_reason"
     test_service.__remove_other_tests(
         __TESTS.copy(),
@@ -347,7 +347,7 @@ def test_logs_skipping_other_test(__mock_log_skip_test):
             }
         ],
     )
-    __mock_log_skip_test.assert_called_once_with(__TESTS[0], reason)
+    _mock_log_skip_test.assert_called_once_with(__TESTS[0], reason)
 
 
 @pytest.mark.parametrize(
@@ -358,7 +358,7 @@ def test_logs_skipping_other_test(__mock_log_skip_test):
         pytest.param(["does_not_exist"]),
     ],
 )
-def test_removes_expected_other_tests(to_remove, __mock_log_skip_test):
+def test_removes_expected_other_tests(to_remove, _mock_log_skip_test):
     remaining = list(set(__TESTS.copy()) - set(to_remove))
     other_tests = [
         {
@@ -373,9 +373,9 @@ def test_removes_expected_other_tests(to_remove, __mock_log_skip_test):
     ), "Different remaining tests than expected."
 
 
-def test_logs_expected_message_when_skipping_gpu_test(__mock_log_skip_test):
+def test_logs_expected_message_when_skipping_gpu_test(_mock_log_skip_test):
     test_service.__log_skip_gpu_test(__TESTS[0])
-    __mock_log_skip_test.assert_called_once_with(__TESTS[0], "Needs GPU")
+    _mock_log_skip_test.assert_called_once_with(__TESTS[0], "Needs GPU")
 
 
 @pytest.mark.parametrize(
@@ -388,12 +388,12 @@ def test_logs_expected_message_when_skipping_gpu_test(__mock_log_skip_test):
     ],
 )
 def test_logs_expected_message_when_skipping_dependency_test(
-    is_plugin, dependency_name, message, __mock_log_skip_test
+    is_plugin, dependency_name, message, _mock_log_skip_test
 ):
     test_service.__log_skip_dependency_test(
         __TESTS[0], dependency_name, is_plugin=is_plugin
     )
-    __mock_log_skip_test.assert_called_once_with(
+    _mock_log_skip_test.assert_called_once_with(
         __TESTS[0], f"Unmet dependency{message}"
     )
 
@@ -440,7 +440,7 @@ def test_logs_expected_warning_message_when_skipping_test(
     ],
 )
 def test_removes_expected_internal_dependency_tests(
-    tests_with_dependencies, expected_tests, __mock_log_skip_test
+    tests_with_dependencies, expected_tests, _mock_log_skip_test
 ):
     assert (
         test_service.__remove_unmet_internal_dependency_tests(
@@ -458,12 +458,12 @@ def test_removes_expected_internal_dependency_tests(
     ],
 )
 def test_logs_expected_internal_dependency_test_removal(
-    tests, tests_text, __mock_log_skip_test
+    tests, tests_text, _mock_log_skip_test
 ):
     test_service.__remove_unmet_internal_dependency_tests(
         __TESTS.copy(), {__TESTS[0]: tests}
     )
-    __mock_log_skip_test.assert_called_once_with(
+    _mock_log_skip_test.assert_called_once_with(
         __TESTS[0], f"Missing dependency with tests: {tests_text}"
     )
 
@@ -517,7 +517,7 @@ def test_returns_expected_circular_dependencies(test_name, dependencies, expecte
     ],
 )
 def test_returns_expected_non_circular_dependency_tests(
-    dependencies, expected_tests, __mock_log_skip_test
+    dependencies, expected_tests, _mock_log_skip_test
 ):
     assert (
         test_service.__remove_circular_dependencies(__TESTS.copy(), dependencies)[0]
@@ -525,21 +525,21 @@ def test_returns_expected_non_circular_dependency_tests(
     ), "Received different tests than expected"
 
 
-def test_logs_expected_circular_dependency_message(__mock_log_skip_test):
+def test_logs_expected_circular_dependency_message(_mock_log_skip_test):
     test_service.__remove_circular_dependency(
         __TESTS.copy(), {__TESTS[0]: [__TESTS[0]]}, [__TESTS[0], __TESTS[0]]
     )
-    __mock_log_skip_test.assert_called_once_with(
+    _mock_log_skip_test.assert_called_once_with(
         __TESTS[0], f"It has a circular dependency: {__TESTS[0]} --> {__TESTS[0]}"
     )
 
 
-def test_does_not_log_non_existing_tests_in_circular_path(__mock_log_skip_test):
+def test_does_not_log_non_existing_tests_in_circular_path(_mock_log_skip_test):
     test_name = "non_existent"
     test_service.__remove_circular_dependency(
         __TESTS.copy(), {test_name: [test_name]}, [test_name, test_name]
     )
-    __mock_log_skip_test.assert_not_called()
+    _mock_log_skip_test.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -754,7 +754,7 @@ def __mock_log_skip_dependency_test():
 
 
 @pytest.fixture
-def __mock_log_skip_test():
+def _mock_log_skip_test():
     with patch("scipion_testrunner.domain.test_service.__log_skip_test") as mock_method:
         yield mock_method
 
