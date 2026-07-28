@@ -101,7 +101,7 @@ def test_calls_download_datasets_when_testing_scipion_plugin(
     __mock_run_tests,
     __mock_get_sorted_results,
     __mock_log_result_summary,
-    __mock_print,
+    _mock_print,
 ):
     __mock_remove_skippable_tests.return_value = __TESTS
     test_service.test_scipion_plugin(__ARGS)
@@ -116,7 +116,7 @@ def test_not_calls_download_datasets_when_testing_scipion_plugin(
     __mock_run_tests,
     __mock_get_sorted_results,
     __mock_log_result_summary,
-    __mock_print,
+    _mock_print,
 ):
     __mock_get_test_config.return_value = ([], __SKIPPABLE, __INTERNAL_DEPENDENCIES)
     __mock_remove_skippable_tests.return_value = __TESTS
@@ -136,7 +136,7 @@ def test_calls_run_tests_when_testing_scipion_plugin(
     __mock_log_warning,
     __mock_get_sorted_results,
     __mock_log_result_summary,
-    __mock_print,
+    _mock_print,
 ):
     __mock_remove_skippable_tests.return_value = __TESTS.copy()
     test_service.test_scipion_plugin(__ARGS)
@@ -161,7 +161,7 @@ def test_calls_log_result_summary_when_testing_scipion_plugin(
     __mock_log_warning,
     __mock_get_sorted_results,
     __mock_log_result_summary,
-    __mock_print,
+    _mock_print,
 ):
     __mock_remove_skippable_tests.return_value = __TESTS.copy()
     test_service.test_scipion_plugin(__ARGS)
@@ -183,7 +183,7 @@ def test_logs_error_with_failed_tests_when_testing_scipion_plugin(
     __mock_get_sorted_results,
     __mock_log_result_summary,
     __mock_log_error,
-    __mock_print,
+    _mock_print,
 ):
     __mock_remove_skippable_tests.return_value = __TESTS.copy()
     __mock_run_tests.return_value = __TESTS.copy()
@@ -203,11 +203,11 @@ def test_logs_success_message_without_failed_tests_when_testing_scipion_plugin(
     __mock_log_warning,
     __mock_get_sorted_results,
     __mock_log_result_summary,
-    __mock_print,
+    _mock_print,
 ):
     __mock_remove_skippable_tests.return_value = __TESTS.copy()
     test_service.test_scipion_plugin(__ARGS)
-    __mock_print.assert_called_with(logger.green("\nAll test passed!"), flush=True)
+    _mock_print.assert_called_with(logger.green("\nAll test passed!"), flush=True)
 
 
 @pytest.mark.parametrize(
@@ -628,7 +628,7 @@ def test_returns_expected_sorted_results():
     }, "Received different result order than expected"
 
 
-def test_logs_expected_messages_in_summary_report(__mock_print):
+def test_logs_expected_messages_in_summary_report(_mock_print):
     file1_name = "file1"
     file2_name = "file2"
     file3_name = "file3"
@@ -647,7 +647,7 @@ def test_logs_expected_messages_in_summary_report(__mock_print):
             file3_name: {"passed": [], "failed": [__TESTS[0]]},
         }
     )
-    __mock_print.assert_has_calls(calls)
+    _mock_print.assert_has_calls(calls)
 
 
 @pytest.fixture
@@ -796,7 +796,7 @@ def __mock_get_sorted_results():
 
 
 @pytest.fixture
-def __mock_print():
+def _mock_print():
     with patch("builtins.print") as mock_method:
         yield mock_method
 
