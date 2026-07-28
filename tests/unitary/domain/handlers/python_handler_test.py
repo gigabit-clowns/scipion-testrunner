@@ -82,6 +82,7 @@ class ExitState:
         """
         if not self.success:
             return "Failed"
+        return None
 
 
 class PoolMock:
