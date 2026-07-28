@@ -58,9 +58,8 @@ def test_generates_expected_no_gpu_arg(_mock_test_service):
 def test_returns_error_when_not_providing_required_params(
     input_args, _mock_test_service
 ):
-    with patch.object(sys, "argv", input_args):
-        with pytest.raises(SystemExit):
-            cli.main()
+    with patch.object(sys, "argv", input_args), pytest.raises(SystemExit):
+        cli.main()
 
 
 @pytest.fixture

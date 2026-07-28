@@ -1,4 +1,5 @@
-from typing import Callable, Optional, Tuple
+from __future__ import annotations
+from typing import Callable
 from unittest.mock import patch
 
 import pytest
@@ -71,7 +72,7 @@ class ExitState:
         """
         self.success = bool(input_str)
 
-    def get(self) -> Optional[str]:
+    def get(self) -> str | None:
         """
         ### Returns a message if the state of the fake operation is failure.
 
@@ -96,13 +97,13 @@ class PoolMock:
         """
         self.processes = processes
 
-    def apply_async(self, func: Callable, args: Tuple):
+    def apply_async(self, func: Callable, args: tuple):
         """
         ### Calls the received callable with given args.
 
         #### Params:
         - func (callable): Callable to run.
-        - args (Tuple): Args to be passed on to the callable.
+        - args (tuple): Args to be passed on to the callable.
 
         #### Returns:
         - (Any): Output of the callable.
@@ -113,13 +114,11 @@ class PoolMock:
         """
         ### Overrides the pool close function.
         """
-        pass
 
     def join(self):
         """
         ### Overrides the pool join function.
         """
-        pass
 
 
 @pytest.fixture
