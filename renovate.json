@@ -6,10 +6,35 @@
   ],
   "minimumReleaseAge": "14 days",
   "internalChecksFilter": "strict",
+  "poetry": {
+    "description": "Not a poetry project, but supersedes default pep manager if left enabled.",
+    "enabled": false
+  },
   "packageRules": [
     {
       "matchDepNames": ["python"],
       "enabled": false
+    },
+    {
+      "description": "The pytest-cov pin for python_version < '3.9'; 6.0.0 raised requires-python to >=3.9.",
+      "matchDepNames": ["pytest-cov"],
+      "matchCurrentVersion": "<6",
+      "constraints": { "python": "3.8" },
+      "constraintsFiltering": "strict"
+    },
+    {
+      "description": "The pytest pin for python_version < '3.9'; 8.4.0 raised requires-python to >=3.9.",
+      "matchDepNames": ["pytest"],
+      "matchCurrentVersion": "<8.4",
+      "constraints": { "python": "3.8" },
+      "constraintsFiltering": "strict"
+    },
+    {
+      "description": "The pytest pin for python_version == '3.9'; 9.0.0 raised requires-python to >=3.10.",
+      "matchDepNames": ["pytest"],
+      "matchCurrentVersion": ">=8.4,<9",
+      "constraints": { "python": "3.9" },
+      "constraintsFiltering": "strict"
     },
     {
       "description": "Security advisories bypass the 14-day delay",
