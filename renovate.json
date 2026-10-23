@@ -39,11 +39,6 @@
       "matchCurrentVersion": ">=8.4,<9",
       "constraints": { "python": "3.9" },
       "constraintsFiltering": "strict"
-    },
-    {
-      "description": "Security advisories bypass the 14-day delay",
-      "matchJsonata": ["$exists(vulnerabilityFixVersion)"],
-      "minimumReleaseAge": "0 days"
     }
   ]
 }
