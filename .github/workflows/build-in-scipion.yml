@@ -1,4 +1,4 @@
-name: Build package in standalone version
+name: Build package within Scipion's enviroment
 on:
   workflow_dispatch:
   pull_request:
@@ -6,54 +6,43 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        os:
-        - ubuntu-latest
-        python-version:
-        - '3.10'
-        - '3.11'
-        - '3.12'
-        - '3.13'
-        - '3.14'
-        include:
-        - os: ubuntu-24
-          python-version: '3.8'
-        - os: ubuntu-24
-          python-version: '3.9'
-    
     steps:
-      - name: Set up Python
-        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
-        with:
-          python-version: ${{ matrix.python-version }}
-        
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Install project
-        working-directory: ${{ github.workspace }}
-        run: pip install -e .[test]
+      - name: Install Miniconda  
+        uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb # v4
+        with:
+          miniconda-version: "latest"
+          auto-update-conda: true
+          auto-activate-base: true
+          activate-environment: scipion3
+          python-version: "3.8"
 
-      - name: Use CLI standalone
-        run: ${{ vars.MODULE_NAME }} -h
-      
-      - name: Use CLI as Python module
-        run: python -m ${{ vars.MODULE_NAME }} -h
-      
-      - name: Run unitary tests
-        env:
-          SCRIPT_PATH: ./scripts/run-tests.sh
+      - name: Install Scipion's dependencies    
         run: |
-          chmod +x $SCRIPT_PATH
-          $SCRIPT_PATH
+          sudo apt-get update
+          sudo apt-get install -y wget gcc-10 g++-10 make cmake
       
-      - name: Check source code with Ruff
-        run: python -m ruff check --config ./conf/ruff-src.toml
+      - name: Install Scipion    
+        working-directory: ${{ github.workspace }}/../
+        run: |
+          pip install --user scipion-installer
+          python -m scipioninstaller -conda -noXmipp -noAsk scipion
+    
+      - name: Install project
+        run: pip install -e .
       
-      - name: Check tests code with Ruff
-        run: python -m ruff check --config ./conf/ruff-tests.toml
+      - name: Install dummy plugin for E2E testing
+        working-directory: ${{ github.workspace }}/../scipion
+        run: ./scipion3 installp -p ${{ github.workspace }}/tests/e2e/scipion-em-dummy --devel
+      
+      - name: Run E2E test
+        env:
+          TEST_MODULE: dummy
+        working-directory: ${{ github.workspace }}/../
+        run: ${{ vars.MODULE_NAME }} ./scipion/scipion3 $TEST_MODULE --noGpu --testData=${{ github.workspace }}/tests/e2e/scipion-em-$TEST_MODULE/$TEST_MODULE/testData.json
