@@ -4,9 +4,13 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: build-in-scipion-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository
