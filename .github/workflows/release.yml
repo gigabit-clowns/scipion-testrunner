@@ -1,6 +1,10 @@
 name: Generate release (Pypi, tag, & GitHub Release)
 on: workflow_dispatch
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
